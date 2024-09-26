@@ -104,11 +104,11 @@ AUTH_USER_MODEL = 'accounts.Account'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'project_db',
-        'USER': 'postgres',
-        'PASSWORD': '2024',
+        'NAME': 'djangoblog',
+        'USER': 'admin',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '',
     }
 }
 
