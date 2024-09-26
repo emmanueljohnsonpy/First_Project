@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY='=y6g2hiq^(7idfoaea$kbf)o$z^=m4bzvaa#s36kdrd0^!q92='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG=True
 
 ALLOWED_HOSTS = ['*']
 
@@ -103,12 +103,12 @@ AUTH_USER_MODEL = 'accounts.Account'
 
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'project_db',
+        'USER': 'postgres',
+        'PASSWORD': '2024',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -170,11 +170,11 @@ MESSAGE_TAGS = {
 # EMAIL_HOST_USER = 'emmanueljohnsonpy@gmail.com'
 # EMAIL_HOST_PASSWORD = 'dopi jpzy ztfm puhm'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'emmanueljohnsonpy@gmail.com'
+EMAIL_HOST_PASSWORD = 'dopi jpzy ztfm puhm'
 
 
 
@@ -184,8 +184,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': config('GOOGLE_CLIENT_ID'),
-            'secret': config('GOOGLE_CLIENT_SECRET'),
+            'client_id': '869220694295-uqhqvnqd2v9ftags89c53usn1n0blrir.apps.googleusercontent.com',
+            'secret': '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',
         },
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
@@ -207,8 +207,8 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 SESSION_COOKIE_NAME = 'user_sessionid'
 
 # Razorpay Keys
-RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
-RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
+RAZORPAY_KEY_ID = 'rzp_test_zj1NWK98xKubgY'
+RAZORPAY_KEY_SECRET = 'GZqqP1hc3iQLXupJCilGkxC4'
 
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
