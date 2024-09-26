@@ -26,7 +26,7 @@ SECRET_KEY='=y6g2hiq^(7idfoaea$kbf)o$z^=m4bzvaa#s36kdrd0^!q92='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG=True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['65.2.114.165', 'localhost', 'kaalpanthu.shop']
 
 # Application definition
 
