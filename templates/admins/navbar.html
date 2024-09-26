@@ -1,0 +1,87 @@
+{% load static %}
+<aside class="navbar-aside" id="offcanvas_aside">
+    <div class="aside-top">
+        <a href="#" class="brand-wrap">
+            <img src="{% static 'admins/assets/imgs/theme/logo.svg' %}" class="logo" alt="Evara Dashboard">
+        </a>
+        <div>
+            <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+        </div>
+    </div>
+    <nav>
+        <ul class="menu-aside">
+            <li class="menu-item {% url 'admindashboard' as admindashboard_url %}{% if request.path == admindashboard_url %}active{% endif %}">
+                <a class="menu-link" href="{{ admindashboard_url }}">
+                    <i class="icon material-icons md-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item {% url 'adminproducts' as adminproducts_url %}{% if request.path == adminproducts_url or 'admineditproducts' in request.path or 'adminaddproduct' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ adminproducts_url }}">
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Products</span>
+                </a>
+            </li>
+            
+            <li class="menu-item {% url 'adminusers' as adminusers_url %}{% if request.path == adminusers_url %}active{% endif %}">
+                <a class="menu-link" href="{{ adminusers_url }}">
+                    <i class="icon material-icons md-person"></i>
+                    <span class="text">Users</span>
+                </a>
+            </li>
+            <li class="menu-item {% url 'admincategories' as admincategories_url %}{% if request.path == admincategories_url or 'admineditcat' in request.path or 'adminaddcat' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ admincategories_url }}">
+                    <i class="icon material-icons md-store"></i>
+                    <span class="text">Categories</span>
+                </a>
+            </li>
+            <!-- <li class="menu-item {% url 'order_list' as order_list_url %}{% if request.path == order_list_url or 'order_list' in request.path or 'adminorders_url' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ order_list_url }}">
+                    <i class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li> -->
+            <li class="menu-item {% url 'order_list' as order_list_url %}{% url 'order_detail_view' 1 as order_detail_url %}{% if request.path == order_list_url or 'order_list' in request.path or 'order_detail_view' in request.path or 'adminorders_url' in request.path %} active {% endif %}">
+                <a class="menu-link" href="{{ order_list_url }}">
+                    <i class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+            
+            <!-- <li class="menu-item {% url 'adminoffers' as adminoffers_url %}{% if request.path == adminoffers_url or 'adminoffers' in request.path or 'adminoffers_url' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ adminoffers_url }}">
+                    <i class="icon material-icons md-monetization_on"></i>
+                    <span class="text">Offers</span>
+                </a>
+            </li> -->
+
+            <li class="menu-item {% url 'adminoffers' as adminoffers_url %}{% if request.path == adminoffers_url or 'adminoffers' in request.path or 'add-product-offer' in request.path or 'add-cat-offer' in request.path or 'edit-offer' in request.path or 'apply-offer' in request.path or 'apply-offer-to-category' in request.path or 'show-items' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ adminoffers_url }}">
+                    <i class="icon material-icons md-monetization_on"></i>
+                    <span class="text">Offers</span>
+                </a>
+            </li>
+            <li class="menu-item {% url 'admincoupons' as admincoupons_url %}{% if request.path == admincoupons_url or 'admincoupons' in request.path or 'edit-coupon' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ admincoupons_url }}">
+                    <i class="icon material-icons md-comment"></i>
+                    <span class="text">Coupons</span>
+                </a>
+            </li>
+            
+            <!-- <li class="menu-item {% url 'admincoupons' as admincoupons_url %}{% if request.path == admincoupons_url or 'admincoupons' in request.path or 'admincoupons_url' in request.path %}active{% endif %}">
+                <a class="menu-link" href="{{ admincoupons_url }}">
+                    <i class="icon material-icons md-comment"></i>
+                    <span class="text">Coupons</span>
+                </a>
+            </li> -->
+          
+        </ul>
+        
+        
+        
+        <hr>
+       
+        <br>
+        <br>
+    </nav>
+</aside>

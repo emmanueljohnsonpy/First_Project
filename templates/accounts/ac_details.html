@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="section-conten padding-y bg">
+
+{% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+        {% include 'includes/dashboard_sidebar.html' %}
+        <main class="col-md-9">
+            <article class="card">
+                <div class="account-details-card">
+                    <h5 class="card-header">Account Details</h5>
+                    <div class="card-body">
+                        <h2 class="user-name">{{ user.first_name }} {{ user.last_name }}</h2>
+                        <hr>
+                        <div class="info-group">
+                            <label for="phone-number">Phone no:</label>
+                            <span id="phone-number">{{ user.phone_number|default:"*nil" }}</span>
+                        </div>
+                        <div class="info-group">
+                            <label for="email-address">Email Address:</label>
+                            <span id="email-address">{{ user.email }}</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editProfileModal">
+                                Edit Profile
+                            </button>
+                            <a href="{% url 'change_password' %}" class="btn btn-success">Change Password</a>
+                        </div>
+                    </div>
+                </div>
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editProfileForm" method="POST" action="{% url 'edit_profile' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="first_name">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                            <div id="first_name_error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                            <div id="last_name_error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_number">Phone Number</label>
+                            <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}">
+                            <div id="phone_number_error" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+                
+                <!-- Include this script for front-end validation -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const form = document.getElementById('editProfileForm');
+                
+                        form.addEventListener('submit', function(event) {
+                            let isValid = true;
+                            
+                            // Validate First Name
+                            const firstName = document.getElementById('first_name');
+                            const firstNameError = document.getElementById('first_name_error');
+                            if (firstName.value.trim().length < 3 || firstName.value.trim().length > 15) {
+                                firstNameError.textContent = 'First name must be between 3 and 15 characters.';
+                                isValid = false;
+                            } else {
+                                firstNameError.textContent = '';
+                            }
+                
+                            // Validate Last Name
+                            const lastName = document.getElementById('last_name');
+                            const lastNameError = document.getElementById('last_name_error');
+                            if (lastName.value.trim().length < 3 || lastName.value.trim().length > 15) {
+                                lastNameError.textContent = 'Last name must be between 3 and 15 characters.';
+                                isValid = false;
+                            } else {
+                                lastNameError.textContent = '';
+                            }
+                
+                            // Validate Phone Number
+                            const phoneNumber = document.getElementById('phone_number');
+                            const phoneNumberError = document.getElementById('phone_number_error');
+                            const phoneNumberValue = phoneNumber.value.trim();
+                            if (!/^\d{10}$/.test(phoneNumberValue)) {
+                                phoneNumberError.textContent = 'Phone number must be exactly 10 digits.';
+                                isValid = false;
+                            } else {
+                                phoneNumberError.textContent = '';
+                            }
+                
+                            if (!isValid) {
+                                event.preventDefault(); // Prevent form submission if validation fails
+                            }
+                        });
+                    });
+                </script>
+                
+            </div>
+        </div>
+    </div>
+
+</section>
+<style>
+    .error-message {
+    color: red;
+    font-size: 0.875em; /* Optional: smaller font size for error messages */
+    margin-top: 0.25em; /* Space between the input and the error message */
+}
+
+</style>
+{% endblock %}

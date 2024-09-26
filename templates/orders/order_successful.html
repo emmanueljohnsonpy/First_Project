@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<div class="container d-flex justify-content-center align-items-center" style="height: 498px;">
+    <div class="text-center">
+        <h1 class="display-4">Order Successful!</h1>
+        <p class="lead">Thank you for your order. Your order has been placed successfully.</p>
+        <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+        <a href="{% url 'my_orders' %}" class="btn btn-secondary">Go to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
+
+

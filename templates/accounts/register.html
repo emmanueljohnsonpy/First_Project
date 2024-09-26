@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+
+    <!-- ============================ COMPONENT REGISTER ================================= -->
+    <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+        <article class="card-body">
+            {% include 'includes/alerts.html' %}
+            <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
+            <form id="registrationForm" action="{% url 'register' %}" method="POST" novalidate>
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label>First name</label>
+                        {{ form.first_name }}
+                        <small class="text-danger" id="first_name_error"></small>
+                    </div> <!-- form-group end.// -->
+                    <div class="col form-group">
+                        <label>Last name</label>
+                        {{ form.last_name }}
+                        <small class="text-danger" id="last_name_error"></small>
+                    </div> <!-- form-group end.// -->
+                </div> <!-- form-row end.// -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Email</label>
+                        {{ form.email }}
+                        <small class="text-danger" id="email_error"></small>
+                    </div> <!-- form-group end.// -->
+                    <div class="form-group col-md-6">
+                        <label>Phone Number</label>
+                        {{ form.phone_number }}
+                        <small class="text-danger" id="phone_number_error"></small>
+                    </div> <!-- form-group end.// -->
+                </div> <!-- form-row.// -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Create password</label>
+                        {{ form.password }}
+                        <small class="text-danger" id="password_error"></small>
+                    </div> <!-- form-group end.// -->
+                    <div class="form-group col-md-6">
+                        <label>Repeat password</label>
+                        {{ form.confirm_password }}
+                        <small class="text-danger" id="confirm_password_error"></small>
+                    </div> <!-- form-group end.// -->
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block"> Register </button>
+                </div> <!-- form-group// -->
+                {{ form.email.errors }}
+                {{ form.non_field_errors }}
+            </form>
+        </article><!-- card-body.// -->
+    </div> <!-- card .// -->
+    <p class="text-center mt-4">Have an account? <a href="{% url 'login' %}">Log In</a></p>
+    <br><br>
+    <!-- ============================ COMPONENT REGISTER END.// ================================= -->
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+<script>
+    document.getElementById('registrationForm').addEventListener('submit', function(event) {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.querySelectorAll('.text-danger').forEach(function(error) {
+            error.textContent = '';
+        });
+
+        // Check first name
+        const firstName = document.getElementById('id_first_name');
+        if (!firstName.value.trim()) {
+            document.getElementById('first_name_error').textContent = 'First name is required';
+            isValid = false;
+        } else if (firstName.value.trim().length < 5 || firstName.value.trim().length > 10) {
+            document.getElementById('first_name_error').textContent = 'First name must be between 5 and 10 characters';
+            isValid = false;
+        }
+
+        // Check last name
+        const lastName = document.getElementById('id_last_name');
+        if (!lastName.value.trim()) {
+            document.getElementById('last_name_error').textContent = 'Last name is required';
+            isValid = false;
+        } else if (lastName.value.trim().length < 5 || lastName.value.trim().length > 10) {
+            document.getElementById('last_name_error').textContent = 'Last name must be between 5 and 10 characters';
+            isValid = false;
+        }
+
+        // Check email
+        const email = document.getElementById('id_email');
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim()) {
+            document.getElementById('email_error').textContent = 'Email is required';
+            isValid = false;
+        } else if (!emailPattern.test(email.value.trim())) {
+            document.getElementById('email_error').textContent = 'Invalid email format';
+            isValid = false;
+        }
+
+        // Check phone number
+        const phoneNumber = document.getElementById('id_phone_number');
+        if (!phoneNumber.value.trim()) {
+            document.getElementById('phone_number_error').textContent = 'Phone number is required';
+            isValid = false;
+        }
+
+        // Check password
+        const password = document.getElementById('id_password');
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+        if (!password.value.trim()) {
+            document.getElementById('password_error').textContent = 'Password is required';
+            isValid = false;
+        } else if (!passwordPattern.test(password.value.trim())) {
+            document.getElementById('password_error').textContent = 'Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, and one number or symbol';
+            isValid = false;
+        }
+
+        // Check confirm password
+        const confirmPassword = document.getElementById('id_confirm_password');
+        if (!confirmPassword.value.trim()) {
+            document.getElementById('confirm_password_error').textContent = 'Confirm password is required';
+            isValid = false;
+        }
+
+        // Check if passwords match
+        if (password.value.trim() && confirmPassword.value.trim() && password.value !== confirmPassword.value) {
+            document.getElementById('confirm_password_error').textContent = 'Passwords do not match';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+
+{% endblock %}

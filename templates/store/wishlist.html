@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-name padding-y-sm">
+    <div class="container">
+    
+    <header class="section-heading">
+      
+    </header><!-- sect-heading -->
+    
+    {% if products %}
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3">
+            <figure class="card card-product-grid">
+                <!-- Image Wrapper -->
+                <div class="img-wrap">
+                    <a href="{{ product.get_url }}">
+                        <img src="{{ product.images.url }}" alt="{{ product.product_name }}" class="img-fluid rounded">
+                    </a>
+                    <!-- Close Button -->
+                    <form id="removeFromWishlistForm" action="{% url 'remove_from_wishlist' product.id %}" method="POST" class="position-absolute" style="top: 10px; right: 10px;">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-link p-0" style="border: none;" onclick="showConfirmationModal(this)">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </form>
+                    
+                </div> <!-- img-wrap.// -->
+    
+                <!-- Product Info -->
+                <figcaption class="info-wrap">
+                    <div class="fix-height">
+                        <a href="{{ product.get_url }}" class="title text-truncate">{{ product.product_name }}</a>
+                        <div class="price-wrap mt-2 d-flex justify-content-between align-items-center">
+                            <span class="price">₹ {{ product.price }}</span>
+                        </div>
+                        
+                        <!-- Rating Stars -->
+                        <div class="rating-star mt-2">
+                            <span>
+                                <i class="fa fa-star{% if product.averageReview < 0.5 %}-o{% elif product.averageReview >= 0.5 and product.averageReview < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 1.5 %}-o{% elif product.averageReview >= 1.5 and product.averageReview < 2 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 2.5 %}-o{% elif product.averageReview >= 2.5 and product.averageReview < 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 3.5 %}-o{% elif product.averageReview >= 3.5 and product.averageReview < 4 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 4.5 %}-o{% elif product.averageReview >= 4.5 and product.averageReview < 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- View Details Button -->
+                    <a href="{{ product.get_url }}" class="btn btn-block btn-primary mt-3">View Details</a>
+                </figcaption>
+            </figure>
+        </div> <!-- col.// -->
+    {% endfor %}
+    
+    </div>
+    {% else %}
+    <h2 class="text-center">Your Wishlist is Empty</h2>
+        <br>
+        <div class="text-center">
+            <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    {% endif %}
+    
+    </div><!-- container // -->
+    </section>
+    <!-- Modal HTML -->
+<div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Action</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this item from your wishlist?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="confirmForm" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, remove it</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function showConfirmationModal(button) {
+        // Show the confirmation modal
+        $('#confirmationModal').modal('show');
+        
+        // Set the action of the confirm form to match the original form's action
+        var form = $(button).closest('form');
+        $('#confirmForm').attr('action', form.attr('action'));
+    }
+
+    // Add this function to handle modal dismissal
+    $(document).ready(function() {
+        $('.close, .btn-secondary').on('click', function() {
+            $('#confirmationModal').modal('hide');
+        });
+
+        // Prevent form submission when clicking the remove button
+        $('form[id^="removeFromWishlistForm"] button').on('click', function(e) {
+            e.preventDefault();
+        });
+    });
+</script>
+
+<style>
+    .product-title {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+</style>
+
+{% endblock %}

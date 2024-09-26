@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            padding: 10px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .bg-primary { background-color: #007bff; }
+        .bg-success { background-color: #28a745; }
+        .bg-info { background-color: #17a2b8; }
+        .bg-warning { background-color: #ffc107; }
+        .bg-danger { background-color: #dc3545; }
+        .text-white { color: #fff; }
+        .text-muted { color: #6c757d; }
+        .text-end { text-align: right; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    
+    <div>
+        <h1 style="padding-left: 175px; text-decoration: underline;">ORDER DETAILS</h1>
+    </div>
+    <br>
+    <div class="card-header bg-white">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <small class="text-muted">Order ID: {{ order.order_number }}</small>
+                <br>
+                <small class="text-muted">Placed on: {{ order.created_at }}</small>
+            </div>
+            <br>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                {% if order.status == 'Pending' or order.status == 'Return Pending' %}
+                    <span class="badge bg-warning text-dark">{{ order.status }}</span>
+                {% elif order.status == 'Cancelled' or order.status == 'Return Cancelled' %}
+                    <span class="badge bg-danger">{{ order.status }}</span>
+                {% else %}
+                    <span class="badge bg-success">{{ order.status }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row gy-4">
+            <!-- Customer Information -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <i class="material-icons md-person me-2"></i> Customer Information
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><strong>Name:</strong> {{ order.name }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ order.email }}</p>
+                        <p class="mb-0"><strong>Phone:</strong> {{ order.user.phone_number }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Information -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <i class="material-icons md-local_shipping me-2"></i> Order Information
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><strong>Shipping:</strong> Fargo Express</p>
+                        <p class="mb-1"><strong>Payment Method:</strong>
+                            {% if order.payment_method == "cash_on_delivery" %}
+                                Cash on Delivery
+                            {% elif order.payment_method == "wallet" %}
+                                Wallet
+                            {% else %}
+                                {{ order.payment_method }}
+                            {% endif %}
+                        </p>
+                        <p class="mb-0"><strong>Status:</strong>
+                            {% if order.status == 'Pending' or order.status == 'Return Pending' %}
+                                Pending
+                            {% elif order.status == 'Cancelled' or order.status == 'Return Cancelled' %}
+                                Cancelled
+                            {% else %}
+                                {{ order.status }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <i class="material-icons md-place me-2"></i> Delivery Address
+                    </div>
+                    <div class="card-body">
+                        {% if checked_address %}
+                            <p class="mb-1">{{ checked_address.address }}</p>
+                            <p class="mb-1">{{ checked_address.address_line2 }}</p>
+                            <p class="mb-1">Pincode: {{ checked_address.pincode }}</p>
+                            <p class="mb-0">City: {{ checked_address.city }}, {{ checked_address.state }}</p>
+                        {% else %}
+                            <p class="mb-0">No address is marked as checked.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items Table -->
+        <div class="table-responsive mt-5">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Size</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in aggregated_items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <!-- <img src="{{ item.product__image1.url }}" alt="{{ item.product__product_name }}" class="img-fluid rounded me-3" width="60"> -->
+                                    <span>{{ item.product__product_name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ item.size }}</td>
+                            <td>{{ item.unit_price }}₹</td>
+                            <td>{{ item.total_quantity }}</td>
+                            <td class="text-end">{{ item.total_price }}₹</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No items found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="4" class="text-start">Total Price:</th>
+                        <th class="text-end">{{ order.total_price }}₹</th>
+                    </tr>
+                    <tr>
+                        <th colspan="4" class="text-start">Tax:</th>
+                        <th class="text-end">{{ order.tax }}₹</th>
+                    </tr>
+                    <tr>
+                        <th colspan="4" class="text-start">Shipping Fee:</th>
+                        <th class="text-end">{{ order.shipping_fee }}₹</th>
+                    </tr>
+                    <!-- Coupon Discount Row -->
+                    {% if order.coupon_price %}
+                    <tr>
+                        <th colspan="4" class="text-start">Coupon Discount:</th>
+                        <th class="text-end">-{{ order.coupon_price }}₹</th>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th colspan="4" class="text-start">Grand Total:</th>
+                        <th class="text-end">{{ order.grand_total }}₹</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="mt-4" style="margin-top: 25px;">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <i class="material-icons md-payment me-2"></i> Payment Method
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">
+                        {% if order.payment_method == "cash_on_delivery" %}
+                            Cash on Delivery
+                        {% elif order.payment_method == "wallet" %}
+                            Wallet
+                        {% else %}
+                            {{ order.payment_method }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="shop-details">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Kaal Panthu</h2>
+                <p><strong>Address:</strong> Football Lane, Soccer City, Football Country, 682045</p>
+                <p><strong>Contact:</strong> 7845213659</p>
+                <p><strong>Email:</strong> contact@kaalpanthu.com</p>
+                <p><strong>GST ID:</strong> 12ABCD3456E1Z2</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

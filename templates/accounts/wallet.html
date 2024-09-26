@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    {% include 'includes/alerts.html' %}
+    
+    <div class="container">
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+            <main class="col-md-9">
+                <!-- Wallet Balance Section -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">Wallet</h4>
+                        <div class="wallet-balance mb-4">
+                            <h2 class="display-4">₹{{ wallet.wallet_balance }}</h2>
+                            <p>Wallet Balance</p>
+                        </div>
+                         <!-- Refer and Earn Button -->
+                         <div class="text-right mb-3">
+                            <a href="#" class="btn btn-success" style="background-color: #008211;" data-bs-toggle="modal" data-bs-target="#referModal">Refer and Earn</a>
+                        </div>
+                        
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type of Payment</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in wallet_transactions %}
+                                <tr>
+                                    <td>{{ transaction.date }}</td>
+                                    <td>{{ transaction.get_transaction_type_display }}</td>
+                                    <td class="{% if transaction.transaction_type == 'credit' %}text-success{% else %}text-danger{% endif %}">
+                                        {% if transaction.transaction_type == 'credit' %}+{% else %}-{% endif %}₹{{ transaction.amount }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3">No transactions found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div> <!-- row.// -->
+    </div>
+    <!-- Modal -->
+<div class="modal fade" id="referModal" tabindex="-1" aria-labelledby="referModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="referModalLabel">Refer and Earn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <div class="modal-body">
+                <h5>Your Code: {{ referral_code }}</h5>
+                <br>
+                <form id="referForm">
+                    <div class="mb-3">
+                        <label for="friendCode" class="form-label">Enter Your Friend's Code</label>
+                        <input type="text" class="form-control" id="friendCode" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>
+
+<style>
+    .wallet-balance {
+        text-align: center;
+    }
+    
+    .wallet-balance .display-4 {
+        color: #008000;
+        font-weight: bold;
+    }
+    
+    .wallet-balance p {
+        font-size: 18px;
+        margin-top: -10px;
+        color: #666;
+    }
+    
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    
+    .table-bordered td {
+        text-align: center;
+    }
+</style>
+<script>
+    document.getElementById('referForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const friendCode = document.getElementById('friendCode').value;
+        // Handle the form submission, e.g., send the code to the server or show a confirmation
+        console.log('Friend Code:', friendCode);
+        // Close the modal
+        const modalElement = document.getElementById('referModal');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+    });
+</script>
+<!-- Add this script in your template -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#referForm').on('submit', function(event) {
+            event.preventDefault();
+            var friendCode = $('#friendCode').val();
+            
+            $.ajax({
+                url: '{% url "apply_referral_code" %}',  // URL for the view handling referral codes
+                type: 'POST',
+                data: {
+                    'friend_code': friendCode,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#referModal').modal('hide');
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,1100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<section class="section-content padding-y bg">
+<div class="container">
+
+<!-- ============================ COMPONENT 1 ================================= -->
+{% if messages %}
+<div class="alert-container" style="margin-bottom: 20px;">
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close custom-close" data-bs-dismiss="alert" aria-label="Close">X</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="row">
+    <aside class="col-lg-6">
+        
+
+
+        <div class="card">
+            
+          
+            <div class="card-body">
+             <!-- <h4 class="card-title mb-4">Add Address</h4>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {% for address in user_addresses %}
+    <div class="address-card p-3 mb-3 border">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="selected_address" id="address{{ address.id }}" value="{{ address.id }}" 
+            {% if address.is_default or forloop.first %}checked{% endif %}>
+            <label class="form-check-label" for="address{{ address.id }}">
+                <p><strong>{{ address.full_name }}</strong></p>
+                <p>{{ address.address }}, {{ address.address_line2|default:"" }}</p>
+                <p>{{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+                <p>Phone: {{ address.phone }}</p>
+                <p>Email: {{ address.email }}</p>
+            </label>
+        </div>
+
+        <div class="mt-2">
+        
+            <a href="#" class="btn btn-secondary btn-sm edit-address-btn" data-bs-toggle="modal" 
+            data-bs-target="#editAddressModal" 
+            data-id="{{ address.id }}" 
+            data-full_name="{{ address.full_name }}" 
+            data-address="{{ address.address }}" 
+            data-address_line2="{{ address.address_line2 }}" 
+            data-city="{{ address.city }}" 
+            data-state="{{ address.state }}" 
+            data-pincode="{{ address.pincode }}" 
+            data-phone="{{ address.phone }}" 
+            data-email="{{ address.email }}">
+                Edit
+            </a>
+
+          
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ address.id }}">
+                Delete
+            </button>
+        </div>
+        <hr>
+    </div>
+{% endfor %}
+
+</form> -->
+<h4 class="card-title mb-4">Add Address</h4>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {% for address in user_addresses %}
+    <div class="address-card p-3 mb-3 border">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="selected_address" id="address{{ address.id }}" value="{{ address.id }}" 
+            {% if forloop.first or address.checked %}checked{% endif %}>
+            <label class="form-check-label" for="address{{ address.id }}">
+                <p><strong>{{ address.full_name }}</strong></p>
+                <p>{{ address.address }}, {{ address.address_line2|default:"" }}</p>
+                <p>{{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+                <p>Phone: {{ address.phone }}</p>
+                <p>Email: {{ address.email }}</p>
+            </label>
+        </div>
+
+        <div class="mt-2">
+            <!-- Edit button -->
+            <a href="#" class="btn btn-secondary btn-sm edit-address-btn" data-bs-toggle="modal" 
+            data-bs-target="#editAddressModal" 
+            data-id="{{ address.id }}" 
+            data-full_name="{{ address.full_name }}" 
+            data-address="{{ address.address }}" 
+            data-address_line2="{{ address.address_line2 }}" 
+            data-city="{{ address.city }}" 
+            data-state="{{ address.state }}" 
+            data-pincode="{{ address.pincode }}" 
+            data-phone="{{ address.phone }}" 
+            data-email="{{ address.email }}">
+                Edit
+            </a>
+
+            <!-- Delete button -->
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ address.id }}">
+                Delete
+            </button>
+        </div>
+        <hr>
+    </div>
+    {% endfor %}
+</form>
+
+<!-- Separate delete form outside the loop -->
+<form id="deleteForm" action="{% url 'delete_address' 0 %}" method="POST" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="address_id" id="addressIdToDelete" value="">
+</form>
+
+
+            
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        Add New Address
+                    </button>
+                </div>
+            </div>
+            
+            
+        </div>
+    </aside>
+    <aside class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <!-- Centered Apply Coupon Form -->
+                <div id="coupon-container" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                    <h5>Have a coupon?</h5>
+                    <!-- Coupon Form -->
+                    <form id="coupon-form" style="display: flex; align-items: center; gap: 10px; background-color: #f8f9fa; padding: 10px 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                        {% csrf_token %}
+                        <input type="text" id="coupon-code" name="coupon_code" placeholder="Enter coupon code" required style="padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 16px; flex: 1;">
+                        <button type="submit" id="apply-coupon-btn" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                            Apply Coupon
+                        </button>
+                    </form>
+                    
+                    <!-- Coupon Status and Remove Button -->
+                    <div id="coupon-status" style="display: none; margin-top: 10px; font-size: 16px; color: #28a745;">
+                        <p id="coupon-message" style="padding-left: 18px;">Coupon applied!</p>
+                        <button id="remove-coupon-btn" style="padding: 8px 16px; background-color: #dc3545; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                            Remove Coupon
+                        </button>
+                    </div>
+                </div>
+    
+                <!-- Order Details and Payment Method Form -->
+                <form method="post" action="{% url 'place_order' %}" onsubmit="return submitRazorpay();">
+                    {% csrf_token %}
+                    <table class="table table-borderless table-shopping-cart">
+                        <!-- Your table structure here for cart items -->
+                        <thead class="text-muted">
+                            <tr class="small text-uppercase">
+                                <th scope="col">Product</th>
+                                <th scope="col" width="120">Quantity</th>
+                                <th scope="col" width="120">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cart_item in cart_items %}
+                            <tr>
+                                <td>
+                                    <figure class="itemside align-items-center">
+                                        <div class="aside">
+                                            <img src="{{ cart_item.product.images.url }}" class="img-sm">
+                                        </div>
+                                        <figcaption class="info">
+                                            <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                                            <p class="text-muted small">
+                                                {% if cart_item.size %}
+                                                    {{ cart_item.size | capfirst }}<br>
+                                                {% endif %}
+                                            </p>
+                                        </figcaption>
+                                    </figure>
+                                </td>
+                                <td>
+                                    <label for="">{{ cart_item.quantity }}</label>
+                                </td>
+                                <td>
+                                    <div class="price-wrap">
+                                        <var class="price">₹ {{ cart_item.sub_total }}</var>
+                                        <small class="text-muted"> ₹ {{ cart_item.product.price }} each </small>    
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                
+                    <!-- Payment Method Selection -->
+                    <div class="payment-methods text-center">
+                        <hr>
+                        <div class="card-body">
+                            <dl class="dlist-align">
+                                <dt>Total price:</dt>
+                                <dd class="text-right">₹ {{ checkout_details.total_price }}</dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Tax:</dt>
+                                <dd class="text-right">₹ {{ checkout_details.tax }}</dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Shipping Fee:</dt>
+                                <dd class="text-right">₹ {{ checkout_details.shipping_fee }}</dd>
+                            </dl>
+                            <!-- <dl class="dlist-align">
+                                <dt>Grand Total:</dt>
+                                <dd class="text-right text-dark b">
+                                    <strong id="grand-total">₹ {{ checkout_details.grand_total }}</strong>
+                                </dd>
+                            </dl> -->
+                            <!-- <dl class="dlist-align">
+                                <dt>Grand Total:</dt>
+                                <dd class="text-right text-dark b">
+                                    <strong id="grand-total">₹ {{ checkout_details.grand_total }}</strong>
+                                </dd>
+                            </dl>
+                            
+                            <dl class="dlist-align" id="discounted-price" style="display: none;">
+                                <dt>New Price (After Coupon):</dt>
+                                <dd class="text-right text-success b">
+                                    <strong id="discounted-total"></strong>
+                                </dd>
+                            </dl> -->
+                            <dl class="dlist-align" id="discounted-price" style="display: none;">
+                                <dt></dt>
+                                <dd class="text-right text-success b">
+                                    <strong id="discounted-total"></strong>
+                                </dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Grand Total:</dt>
+                                <dd class="text-right text-dark b">
+                                    <strong id="grand-total"></strong>
+                                </dd>
+                            </dl>
+                        </div>
+                
+                        <hr>
+                
+                        <h5>Select Payment Method</h5>
+                       
+                        <div class="d-flex justify-content-center">
+                            <div class="form-check mx-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="cash_on_delivery" value="cash_on_delivery" checked>
+                                <label class="form-check-label" for="cash_on_delivery">
+                                    Cash on Delivery
+                                </label>
+                            </div>
+                            <div class="form-check mx-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="wallet" value="wallet">
+                                <label class="form-check-label" for="wallet">
+                                    Wallet
+                                </label>
+                            </div>
+                            <div class="form-check mx-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="razorpay" value="razorpay">
+                                <label class="form-check-label" for="razorpay">
+                                    Razorpay
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                
+                    <input type="hidden" id="razorpay_payment_id" name="razorpay_payment_id">
+                    <input type="hidden" id="razorpay_order_id" name="razorpay_order_id">
+                    <input type="hidden" id="razorpay_signature" name="razorpay_signature">
+                
+                    <button type="submit" name="submit" class="btn btn-primary btn-block">Place Order</button>
+                    <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                </form>
+                <!-- Modal for payment failure -->
+                <div id="payment-failure-modal" style="display: none;">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal()">&times;</span>
+                        <p>Order failed. Please try again.</p>
+                        <button class="retry-btn" onclick="redirectToRetry()">Retry</button>
+                    </div>
+                </div>
+                
+                <style>
+                /* Modal Styles */
+                #payment-failure-modal {
+                    position: fixed;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.6); /* Slightly darker for better focus on modal */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                
+                .modal-content {
+                    background: #fff;
+                    padding: 30px;
+                    border-radius: 10px;
+                    text-align: center;
+                    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+                    max-width: 400px;
+                    width: 100%;
+                    position: relative;
+                }
+                
+                .close-btn {
+                    position: absolute;
+                    top: 10px;
+                    right: 20px;
+                    font-size: 30px;
+                    color: #333;
+                    cursor: pointer;
+                }
+                
+                .modal-content p {
+                    font-size: 18px;
+                    margin-bottom: 20px;
+                    color: #333;
+                    font-weight: bold;
+                }
+                
+                /* Retry Button Styles */
+                .retry-btn {
+                    background-color: #28a745; /* Green background */
+                    color: #fff; /* White text */
+                    border: none;
+                    padding: 12px 20px;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                    outline: none;
+                }
+                
+                .retry-btn:hover {
+                    background-color: #218838; /* Darker green on hover */
+                }
+                
+                .retry-btn:focus {
+                    outline: none; /* Remove focus outline */
+                }
+                
+                </style>
+                
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function submitRazorpay() {
+        var paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        var csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+
+        if (paymentMethod) {
+            var paymentMethodValue = paymentMethod.value;
+            console.log('Payment method selected:', paymentMethodValue);
+
+            if (paymentMethodValue === 'razorpay') {
+                var options = {
+                    "key": "{{ RAZORPAY_KEY_ID }}",
+                    "amount": "{{ checkout_details.grand_total|floatformat:2 }}",
+                    "currency": "INR",
+                    "name": "Kaal Panthu",
+                    "description": "Purchase Description",
+                    "image": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQSDF1c0GHSnXQNLKfAgIefodxcRMNhcpNenXsFt18yQgi6IbXZ",
+                    "order_id": "{{ razorpay_order_id }}",
+                    "handler": function (response) {
+                        console.log('Razorpay response:', response);
+
+                        // Prepare data to send via AJAX
+                        var paymentData = {
+                            'razorpay_payment_id': response.razorpay_payment_id,
+                            'razorpay_order_id': response.razorpay_order_id,
+                            'razorpay_signature': response.razorpay_signature,
+                            'csrfmiddlewaretoken': csrfToken  // Include CSRF token for security
+                        };
+
+                        // Send AJAX request to Django view
+                        $.ajax({
+                            type: 'POST',
+                            url: '{% url "place_order" %}',  // Your Django URL for processing payment
+                            data: paymentData,
+                            success: function (response) {
+                                console.log('Payment processed successfully:', response);
+                                // Redirect to a success page
+                                window.location.href = '{% url "order_successful" %}';  // Adjust the URL as needed
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Payment processing failed:', error);
+                                // Handle errors (e.g., show an error message)
+                                showModal();
+                            }
+                        });
+
+                        return false;
+                    },
+                    "prefill": {
+                        "name": "{{ request.user.get_full_name }}",
+                        "email": "{{ request.user.email }}"
+                    },
+                    "notes": {
+                        "address": "Your Address"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    },
+                    "modal": {
+                        "ondismiss": function () {
+                            // Custom behavior when the modal is dismissed
+                            showModal();
+                        }
+                    }
+                };
+
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+
+                return false;
+            } else {
+                console.log('Non-Razorpay payment method selected, submitting form directly.');
+                return true;
+            }
+        } else {
+            console.log('No payment method selected, submitting form directly.');
+            return true;
+        }
+    }
+
+    function showModal() {
+        document.getElementById('payment-failure-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('payment-failure-modal').style.display = 'none';
+    }
+
+    function redirectToRetry() {
+        // Redirect to the retry page or refresh the current page
+        window.location.href = '{% url "retry_page" %}';  // Adjust the URL as needed
+    }
+</script>
+
+
+            </div> <!-- card-body.// -->
+        </div> <!-- card.// -->
+    </aside>
+<!-- razorpay -->
+
+    
+
+    
+        
+    
+     <!-- col.// -->
+
+
+</div> 
+</div> <!-- container .//  -->
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this address? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteForm').submit();">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm" action="{% url 'orders_address' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="full_name">Full name *</label>
+                        <input type="text" id="full_name" name="full_name" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="address">Address *</label>
+                        <input type="text" id="address" name="address" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="address_line2">Address line2</label>
+                        <input type="text" id="address_line2" name="address_line2" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="city">City / Town *</label>
+                        <input type="text" id="city" name="city" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" name="state" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="pincode">Pincode / ZIP *</label>
+                        <input type="text" id="pincode" name="pincode" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="phone">Phone *</label>
+                        <input type="text" id="phone" name="phone" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="email">Email address *</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <div class="modal-body">
+                <form id="editAddressForm" action="{% url 'update_address' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit_address_id" name="address_id">
+                    <div class="form-group mb-3">
+                        <label for="edit_full_name">Full name *</label>
+                        <input type="text" id="edit_full_name" name="full_name" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_address">Address *</label>
+                        <input type="text" id="edit_address" name="address" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_address_line2">Address line2</label>
+                        <input type="text" id="edit_address_line2" name="address_line2" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_city">City / Town *</label>
+                        <input type="text" id="edit_city" name="city" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_state">State *</label>
+                        <input type="text" id="edit_state" name="state" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_pincode">Pincode / ZIP *</label>
+                        <input type="text" id="edit_pincode" name="pincode" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_phone">Phone *</label>
+                        <input type="text" id="edit_phone" name="phone" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_email">Email address *</label>
+                        <input type="email" id="edit_email" name="email" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+<style>
+  .btn-primary {
+    color: #fff;
+    background-color: #3167eb;
+    border-color: #3167eb;
+    width: 100%;
+  }
+</style>
+  
+<style>
+    .alert {
+      display: flex;
+      justify-content: space-between; /* Space between content and close button */
+      align-items: center; /* Center align items vertically */
+  }
+  
+  .alert .btn-close {
+      background-color: transparent;
+      border: none;
+      font-size: 16px;
+      color: #000000; /* Red color for the 'X' */
+      cursor: pointer;
+  }
+  
+  .alert .btn-close:hover {
+      color: #000000; /* Darker red on hover */
+  }
+  
+  .alert .btn-close:focus {
+      outline: none;
+      box-shadow: none;
+  }
+  
+  </style>    
+      
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    var editButtons = document.querySelectorAll(".edit-address-btn");
+
+    editButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var addressId = button.getAttribute("data-id");
+            var fullName = button.getAttribute("data-full_name");
+            var address = button.getAttribute("data-address");
+            var addressLine2 = button.getAttribute("data-address_line2");
+            var city = button.getAttribute("data-city");
+            var state = button.getAttribute("data-state");
+            var pincode = button.getAttribute("data-pincode");
+            var phone = button.getAttribute("data-phone");
+            var email = button.getAttribute("data-email");
+
+            // Populate the form fields in the modal
+            document.getElementById("edit_address_id").value = addressId;
+            document.getElementById("edit_full_name").value = fullName;
+            document.getElementById("edit_address").value = address;
+            document.getElementById("edit_address_line2").value = addressLine2;
+            document.getElementById("edit_city").value = city;
+            document.getElementById("edit_state").value = state;
+            document.getElementById("edit_pincode").value = pincode;
+            document.getElementById("edit_phone").value = phone;
+            document.getElementById("edit_email").value = email;
+        });
+    });
+});
+</script>
+<style>
+    input:checked ~ label, label:hover ~ label {
+    color: #0410ff;
+}
+input:checked + label:hover, input:checked ~ label:hover, input:checked ~ label:hover ~ label, label:hover ~ input:checked ~ label {
+    color: #5f89f0;
+}
+</style>
+
+<script>
+    // Wait for the DOM to fully load
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all alerts
+        var alerts = document.querySelectorAll('.alert');
+
+        alerts.forEach(function (alert) {
+            // Set timeout to hide alert after 3 seconds
+            setTimeout(function () {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close(); // Close the alert
+            }, 5000); // 3000 milliseconds = 3 seconds
+        });
+    });
+</script>
+
+<script>
+    // Handle delete button click
+    document.querySelectorAll('[data-bs-target="#confirmDeleteModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const addressId = this.getAttribute('data-id');
+            // Update the form action URL with the correct address ID
+            const form = document.getElementById('deleteForm');
+            form.action = `{% url 'delete_address' 0 %}`.replace('0', addressId);
+            // Set the hidden input value if needed
+            document.getElementById('addressIdToDelete').value = addressId;
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    checkCouponStatus();
+
+    // Handle coupon application
+    document.getElementById('coupon-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        const couponCode = document.getElementById('coupon-code').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+        fetch("{% url 'apply_coupon' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ coupon_code: couponCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                checkCouponStatus();
+                Toastify({
+                    text: "Coupon applied successfully! Discount has been applied.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#28a745",
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Toastify({
+                text: "An error occurred. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+            }).showToast();
+        });
+    });
+    
+    // Handle coupon removal
+    document.getElementById('remove-coupon-btn').addEventListener('click', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+        fetch("{% url 'remove_coupon' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                checkCouponStatus();
+                Toastify({
+                    text: "Coupon removed successfully.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#ffc107",
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Toastify({
+                text: "Error removing coupon. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+            }).showToast();
+        });
+    });
+});
+
+function checkCouponStatus() {
+    fetch("{% url 'check_coupon_status' %}", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.coupon_applied) {
+            document.getElementById('discounted-total').textContent = '₹ ' + data.grand_total;
+            document.getElementById('grand-total').innerHTML = '<s>₹ ' + data.original_total + '</s>';
+            document.getElementById('discounted-price').style.display = 'block';
+            document.getElementById('coupon-status').style.display = 'block';
+            document.getElementById('coupon-form').style.display = 'none';
+            document.getElementById('remove-coupon-btn').style.display = 'block';
+            document.getElementById('coupon-code').value = data.coupon_code;
+        } else {
+            document.getElementById('grand-total').textContent = '₹ ' + data.grand_total;
+            document.getElementById('discounted-price').style.display = 'none';
+            document.getElementById('coupon-status').style.display = 'none';
+            document.getElementById('coupon-form').style.display = 'flex';
+            document.getElementById('remove-coupon-btn').style.display = 'none';
+            document.getElementById('coupon-code').value = '';
+        }
+    })
+    .catch(error => {
+        console.error('Error checking coupon status:', error);
+    });
+}
+</script>
+<!-- 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    checkCouponStatus();
+
+    // Handle coupon application
+    document.getElementById('coupon-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        const couponCode = document.getElementById('coupon-code').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+        fetch("{% url 'apply_coupon' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ coupon_code: couponCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                checkCouponStatus();
+                Toastify({
+                    text: "Coupon applied successfully! Discount has been applied.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#28a745",
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Toastify({
+                text: "An error occurred. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+            }).showToast();
+        });
+    });
+    
+    // Handle coupon removal
+    document.getElementById('remove-coupon-btn').addEventListener('click', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+        fetch("{% url 'remove_coupon' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                checkCouponStatus();
+                Toastify({
+                    text: "Coupon removed successfully.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#ffc107",
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Toastify({
+                text: "Error removing coupon. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+            }).showToast();
+        });
+    });
+});
+
+function checkCouponStatus() {
+    fetch("{% url 'check_coupon_status' %}", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.coupon_applied) {
+            document.getElementById('grand-total').textContent = '₹ ' + data.original_total;
+            document.getElementById('discounted-total').textContent = '₹ ' + data.grand_total;
+            document.getElementById('discounted-price').style.display = 'block';
+            document.getElementById('coupon-status').style.display = 'block';
+            document.getElementById('coupon-form').style.display = 'none';
+            document.getElementById('remove-coupon-btn').style.display = 'block';
+            document.getElementById('coupon-code').value = data.coupon_code;
+        } else {
+            document.getElementById('grand-total').textContent = '₹ ' + data.grand_total;
+            document.getElementById('discounted-price').style.display = 'none';
+            document.getElementById('coupon-status').style.display = 'none';
+            document.getElementById('coupon-form').style.display = 'flex';
+            document.getElementById('remove-coupon-btn').style.display = 'none';
+            document.getElementById('coupon-code').value = '';
+        }
+    })
+    .catch(error => {
+        console.error('Error checking coupon status:', error);
+    });
+}
+</script> -->
+<!-- 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        checkCouponStatus();
+    
+        // Handle coupon application
+        document.getElementById('coupon-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+        
+            const couponCode = document.getElementById('coupon-code').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+            fetch("{% url 'apply_coupon' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ coupon_code: couponCode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    checkCouponStatus(); // Call this instead of updating UI directly
+                    Toastify({
+                        text: "Coupon applied successfully! Discount has been applied.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#28a745",
+                    }).showToast();
+                } else {
+                    Toastify({
+                        text: data.message,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545",
+                    }).showToast();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Toastify({
+                    text: "An error occurred. Please try again.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            });
+        });
+        
+        // Handle coupon removal
+        document.getElementById('remove-coupon-btn').addEventListener('click', function() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+            fetch("{% url 'remove_coupon' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    checkCouponStatus(); // Call this instead of updating UI directly
+                    Toastify({
+                        text: data.message || "Coupon removed successfully.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#ffc107",
+                    }).showToast();
+                } else {
+                    Toastify({
+                        text: data.message,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545",
+                    }).showToast();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Toastify({
+                    text: "Error removing coupon. Please try again.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            });
+        });
+    });
+    
+    function checkCouponStatus() {
+        fetch("{% url 'check_coupon_status' %}", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.coupon_applied) {
+                document.getElementById('grand-total').textContent = '₹ ' + data.grand_total;
+                document.getElementById('coupon-status').style.display = 'block';
+                document.getElementById('coupon-form').style.display = 'none';
+                document.getElementById('remove-coupon-btn').style.display = 'block';
+                document.getElementById('coupon-code').value = data.coupon_code;
+            } else {
+                document.getElementById('coupon-status').style.display = 'none';
+                document.getElementById('coupon-form').style.display = 'flex';
+                document.getElementById('remove-coupon-btn').style.display = 'none';
+                document.getElementById('coupon-code').value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking coupon status:', error);
+        });
+    }
+</script> -->
+
+      
+{% endblock %}
+
+
+<!-- // place order -->
+
+<!-- document.getElementById('placeorder').addEventListener('click',async (e) => {
+    e.preventDefault()
+    const payment_methods=document.getElementById('')
+    const response=fetch('/placeorder',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:JSON.stringify({data})
+    })
+    
+}) -->

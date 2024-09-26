@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Admin Side | Kaal Panthu</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'admins/Male Icon Clipart Transparent Background, Business Male Icon Vector, Business Icons, Male Icons, Job Clipart PNG Image For Free Download (1).jpeg' %}">
+    <!-- Template CSS -->
+    <link href="{% static 'admins/assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    {% include 'admins/navbar.html' %}
+    {% block content %}
+    
+    {% endblock content %}
+    <script src="{% static 'admins/assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/chart.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'admins/assets/js/main.js' %}" type="text/javascript"></script>
+    <script src="{% static 'admins/assets/js/custom-chart.js' %}" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+</body>
+
+</html>

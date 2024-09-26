@@ -1,0 +1,121 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        
+    </header>
+    
+
+    <section class="content-main">
+        {% if messages %}
+    <div class="alert-messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Categories List</h2>
+                
+            </div>
+            
+            
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <article class="itemlist" style="border-bottom: 0px;">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8 col-sm-8 col-8">
+                            <div class="info">
+                                <h6 class="mb-0">Category Name</h6>
+                                <p class="mb-0 text-muted">Description</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </header> <!-- card-header end// -->
+        
+            <div class="card-body">
+                {% for product in products %}
+                <article class="itemlist">
+                    <div class="row align-items-center">
+                        <!-- Category Name and Description -->
+                        <div class="col-lg-8 col-sm-8 col-8">
+                            <div class="info">
+                                <h6 class="mb-1">{{ product.category_name }}</h6>
+                                <p class="mb-0 text-muted">{{ product.description }}</p>
+                            </div>
+                        </div>
+        
+                        <!-- Apply Offer Button -->
+                        <div class="col-lg-4 col-sm-4 col-4 text-end">
+                            {% if product.offer_added %}
+                                <form method="POST" action="{% url 'remove_offer_from_category' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="category_id" value="{{ product.id }}">
+                                    <input type="hidden" name="offer_id" value="{{ selected_offer_id }}">
+                                    <button type="submit" class="btn btn-sm font-sm rounded btn-danger">
+                                        Remove Offer
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form method="POST" action="{% url 'apply_offer_to_category' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="category_id" value="{{ product.id }}">
+                                    <input type="hidden" name="offer_id" value="{{ selected_offer_id }}">
+                                    <button type="submit" class="btn btn-sm font-sm rounded btn-brand">
+                                        Apply Offer
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        
+                    </div> <!-- row .// -->
+                </article> <!-- itemlist .// -->
+                {% endfor %}
+            </div>
+            <!-- card-body end// -->
+        </div>
+        
+         <!-- card end// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script>2024 ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+<style>
+    .alert-out-of-stock {
+    background-color: red;
+    color: white;
+}
+
+</style>
+{% endblock content %}

@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- ========================= SECTION PAGETOP ========================= -->
+<section class="section-pagetop bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                {% if 'search' in request.path %}
+                    <h2 class="title-page display-4 font-weight-bold">Search Result</h2>
+                    <p class="text-muted">Discover the best matches for your search.</p>
+                {% else %}
+                    <h2 class="title-page display-4 font-weight-bold">STORE</h2>
+                    <p class="text-muted">Explore our wide range of products tailored just for you.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div> <!-- container //  -->
+</section>
+<style>
+    .section-pagetop {
+    background-color: #f8f9fa; /* Light background for a modern look */
+    padding-top: 60px;
+    padding-bottom: 60px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.title-page {
+    color: #343a40; /* Darker color for better readability */
+}
+
+.title-page.display-4 {
+    font-size: 2.5rem; /* Adjusts the font size for the title */
+    line-height: 1.2;
+}
+
+.text-muted {
+    font-size: 1.1rem; /* Slightly larger text for better visibility */
+    margin-top: 10px;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important; /* Bootstrap's light background color */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .title-page.display-4 {
+        font-size: 2rem;
+    }
+
+    .text-muted {
+        font-size: 1rem;
+    }
+}
+
+</style>
+    <!-- ========================= SECTION INTRO END// ========================= -->
+
+    <!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+    <div class="container">
+    
+    <div class="row">
+        <aside class="col-md-3">
+            
+    <div class="card">
+        <article class="filter-group">
+            <header class="card-header">
+                <a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
+                    <i class="icon-control fa fa-chevron-down"></i>
+                    <h6 class="title">Categories</h6>
+                </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_1" >
+                <div class="card-body">
+                    
+                    <ul class="list-menu">
+                        {% url 'store' as store_url %}
+                        <li class="{% if request.path == store_url %}active{% endif %}">
+                            <a href="{{ store_url }}">All Products</a>
+                        </li>
+                        {% for category in links %}
+                            <li class="{% if request.path == category.get_url %}active{% endif %}">
+                                <a href="{{ category.get_url }}">{{ category.category_name }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    
+                    
+    
+                </div> <!-- card-body.// -->
+            </div>
+        </article> <!-- filter-group  .// -->
+        <article class="filter-group">
+            <header class="card-header">
+                <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
+                    <i class="icon-control fa fa-chevron-down"></i>
+                    <h6 class="title">Sizes </h6>
+                </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_4" >
+                <div class="card-body">
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> XS </span>
+                  </label>
+    
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> SM </span>
+                  </label>
+    
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> LG </span>
+                  </label>
+    
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> XXL </span>
+                  </label>
+            </div><!-- card-body.// -->
+            </div>
+        </article> <!-- filter-group .// -->
+        
+        <article class="filter-group">
+            <header class="card-header">
+                <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
+                    <i class="icon-control fa fa-chevron-down"></i>
+                    <h6 class="title">Price range </h6>
+                </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_3" >
+                <div class="card-body">
+                    
+                    <div class="form-row">
+                        
+                    <div class="form-group text-right col-md-6">
+                      <label>Max</label>
+                          <select class="mr-2 form-control">
+                            <option value="50">₹50</option>
+                            <option value="100">₹100</option>
+                            <option value="150">₹150</option>
+                            <option value="200">₹200</option>
+                            <option value="500">₹500</option>
+                            <option value="1000">₹1000</option>
+                            <option value="2000">₹2000+</option>
+                        </select>
+                    </div>
+                    </div> <!-- form-row.// -->
+                    <button class="btn btn-block btn-primary">Apply</button>
+                </div><!-- card-body.// -->
+            </div>
+        </article> <!-- filter-group .// -->
+        
+    </div> <!-- card.// -->
+    
+        </aside> <!-- col.// -->
+        <main class="col-md-9">
+    
+            <!-- <header class="border-bottom mb-4 pb-3">
+                
+                <div class="container mt-4">
+                    <div class="row align-items-center">
+                       
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h4><b>{{ product_count }}</b> items found</h4>
+                        </div>
+                        
+                      
+                        <div class="col-md-6">
+                            <form method="GET" action="{% url 'search' %}" class="form-inline">
+                                <div class="form-group mb-2 mr-2">
+                                    <input type="text" name="keyword" class="form-control" placeholder="Search products..." value="{{ request.GET.keyword }}">
+                                </div>
+                                
+                                <div class="form-group mb-2 mr-2">
+                                    <select name="sort_by" class="form-control">
+                                        <option value="">Sort By</option>
+                                        <option value="name_asc" {% if request.GET.sort_by == "name_asc" %}selected{% endif %}>A to Z</option>
+                                        <option value="name_desc" {% if request.GET.sort_by == "name_desc" %}selected{% endif %}>Z to A</option>
+                                        <option value="price_asc" {% if request.GET.sort_by == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+                                        <option value="price_desc" {% if request.GET.sort_by == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+                                        <option value="new_arrivals" {% if request.GET.sort_by == "new_arrivals" %}selected{% endif %}>New Arrivals</option>
+                                        <option value="featured" {% if request.GET.sort_by == "featured" %}selected{% endif %}>Featured</option>
+                                        <option value="popularity" {% if request.GET.sort_by == "popularity" %}selected{% endif %}>Popularity</option>
+                                        <option value="average_ratings" {% if request.GET.sort_by == "average_ratings" %}selected{% endif %}>Average Ratings</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary mb-2">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </header> -->
+            <header class="border-bottom mb-4 pb-3">
+                <div class="container mt-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <!-- Display the number of items found -->
+                        <h4 class="mb-0"><b>{{ product_count }}</b> items found</h4>
+                        
+                        <!-- Sorting and search form -->
+                        <form method="GET" action="{% url 'search' %}" class="d-flex">
+                            <input type="text" name="keyword" class="form-control mr-2" placeholder="Search products..." value="{{ request.GET.keyword }}">
+                            
+                            <select name="sort_by" class="form-control mr-2">
+                                <option value="">Sort By</option>
+                                <option value="name_asc" {% if request.GET.sort_by == "name_asc" %}selected{% endif %}>Aa to Zz</option>
+                                <option value="name_desc" {% if request.GET.sort_by == "name_desc" %}selected{% endif %}>Zz to Aa</option>
+                                <option value="price_asc" {% if request.GET.sort_by == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_desc" {% if request.GET.sort_by == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+                                <option value="new_arrivals" {% if request.GET.sort_by == "new_arrivals" %}selected{% endif %}>New Arrivals</option>
+                                <option value="featured" {% if request.GET.sort_by == "featured" %}selected{% endif %}>Featured</option>
+                                <option value="popularity" {% if request.GET.sort_by == "popularity" %}selected{% endif %}>Popularity</option>
+                                <option value="average_ratings" {% if request.GET.sort_by == "average_ratings" %}selected{% endif %}>Average Ratings</option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </header>
+            
+    
+    <div class="row">
+        {% if products %}
+        {% for product in products %}
+        <div class="col-md-4">
+            <figure class="card card-product-grid">
+                <!-- Image Wrapper -->
+                <div class="img-wrap">
+                    <a href="{{ product.get_url }}">
+                        <img src="{{ product.images.url }}" alt="{{ product.product_name }}" class="img-fluid rounded">
+                    </a>
+                </div> <!-- img-wrap.// -->
+                <a href="#" class="wishlist-icon position-absolute" style="top: 10px; right: 10px;" data-product-id="{{ product.id }}" onclick="toggleWishlist(event, this)">
+                    <i class="fa fa-heart text-secondary{% if product.wishlisted %} text-danger{% endif %}"></i>
+                </a>
+                
+                
+                
+                <!-- Product Info -->
+                <figcaption class="info-wrap">
+                    <div class="fix-height">
+                        <a href="{{ product.get_url }}" class="title text-truncate">{{ product.product_name }}</a>
+                        
+                        
+                        
+                        <!-- Rating Stars -->
+                        <div class="rating-star mt-2">
+                            <span>
+                                <i class="fa fa-star{% if product.averageReview < 0.5 %}-o{% elif product.averageReview >= 0.5 and product.averageReview < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 1.5 %}-o{% elif product.averageReview >= 1.5 and product.averageReview < 2 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 2.5 %}-o{% elif product.averageReview >= 2.5 and product.averageReview < 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 3.5 %}-o{% elif product.averageReview >= 3.5 and product.averageReview < 4 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if product.averageReview < 4.5 %}-o{% elif product.averageReview >= 4.5 and product.averageReview < 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div class="price-wrap mt-2 d-flex justify-content-between align-items-center">
+                            <span class="price">
+                                ₹ {{ product.price }}
+                                {% if product.discount_percentage > 0 %}
+                                    <span style="font-size: 12px; padding-left: 3px;">
+                                        <s>{{ product.old_price }}</s>
+                                    </span>
+                                    <span style="font-size: 12px; padding-left: 3px;">
+                                        {{ product.discount_percentage }}%
+                                    </span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                    </div>
+                    {% if product.get_total_stock == 0 %}
+                                <span class="stock text-danger" style="font-size: 11px;">Out of Stock</span>
+                            {% elif product.get_total_stock < 10 %}
+                                <span class="stock text-danger" style="font-size: 11px;">Only {{ product.get_total_stock }} items left!</span>
+                            {% else %}
+                                <span class="stock text-success" style="font-size: 11px;">Stock Available</span>
+                            {% endif %}
+                    <!-- View Details Button -->
+                    <a href="{{ product.get_url }}" class="btn btn-block btn-primary mt-3">View Details</a>
+                </figcaption>
+            </figure>
+        </div>
+         <!-- col.// -->
+{% endfor %}
+
+        {% else %}
+        <div>
+            <h2>No result found. Please try again.</h2>
+        </div>
+        {% endif %}
+    </div> <!-- row end.// -->
+    
+    
+    <nav class="mt-4" aria-label="Page navigation sample">
+        <div class="pagination">
+            <!-- Previous Page Link -->
+            <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        
+            <!-- Current Page Number -->
+            <span class="page-link active" style="background-color: blue; color: white;">1</span>
+        
+            <!-- Next Page Link -->
+            <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </div>
+        
+    </nav>
+    
+    
+        </main> <!-- col.// -->
+    
+    </div>
+    
+    </div> <!-- container .//  -->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+<style>
+.sort-container {
+        display: inline-block;
+        margin: 5px;
+    }
+
+    .sort-container label {
+        font-size: 12px; /* Smaller font size for the label */
+        color: #333;
+        margin-right: 6px;
+    }
+
+    .sort-dropdown {
+        padding: 4px 8px; /* Smaller padding */
+        font-size: 12px; /* Smaller font size */
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        color: #333;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .sort-dropdown:hover {
+        border-color: #007bff; /* Blue color on hover */
+    }
+
+    .sort-dropdown:focus {
+        border-color: #0056b3; /* Darker blue on focus */
+    }
+
+    .sort-dropdown option {
+        background-color: white; /* White background for options */
+        color: #333; /* Dark text color for options */
+    }
+
+    .sort-dropdown option:hover {
+        background-color: #007bff; /* Blue background on hover */
+        color: white; /* White text on hover */
+    }
+    .list-menu li a {
+    color: #333; /* Default text color */
+    text-decoration: none;
+}
+
+.list-menu li.active a {
+    color: #007bff; /* Active link color */ /* Optional: Make the active link bold */
+   
+}
+
+
+</style>
+<script>
+    document.getElementById('sort').addEventListener('change', function() {
+        var value = this.value;
+        console.log('Selected sort option:', value);
+        // You can add your sorting logic here based on the selected value.
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+<!-- CSRF token retrieval script -->
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<!-- Wishlist Toggle Script -->
+<script>
+    function toggleWishlist(event, element) {
+        event.preventDefault(); // Prevent the page from scrolling to the top
+        const productId = element.getAttribute('data-product-id');
+        
+        axios.post(`/store/toggle-wishlist/${productId}/`, {}, {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            if (response.data.success) {
+                element.querySelector('i').classList.toggle('text-danger');
+            } else {
+                console.error(response.data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
+
+</body>
+
+
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        <!-- Header content here -->
+    </header>
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Users list</h2>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control">
+                    </div>
+                </div>
+            </header>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td width="40%">
+                                    <a href="#" class="itemside">
+                                        <div class="left">
+                                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtuphMb4mq-EcVWhMVT8FCkv5dqZGgvn_QiA&s" class="img-sm img-avatar" alt="Userpic">
+                                        </div>
+                                        <div class="info pl-3">
+                                            <h6 class="mb-0 title">{{ user.username }}</h6>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge rounded-pill {% if not user.is_blocked %}alert-danger{% else %}alert-success{% endif %}">
+                                        {% if not user.is_blocked %}Blocked{% else %}Unblocked{% endif %}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <form action="{% url 'toggle_user_status' user.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-brand rounded font-sm mt-15">
+                                            {% if not user.is_blocked %}Unblock{% else %}Block{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
+                                
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {% if users.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ users.previous_page_number }}" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+        
+                    {% for num in users.paginator.page_range %}
+                        {% if users.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num > users.number|add:'-2' and num < users.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if users.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ users.next_page_number }}" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        
+    </section>
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script>2024 ©, Evara - HTML Ecommerce Template.
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all alerts
+        var alerts = document.querySelectorAll('.alert');
+
+        alerts.forEach(function(alert) {
+            // Set a timeout to remove the alert after 4 seconds
+            setTimeout(function() {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 4000);
+        });
+    });
+</script>
+
+{% endblock content %}

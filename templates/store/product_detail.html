@@ -1,0 +1,724 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .img-big-wrap {
+        overflow: hidden; /* Hide overflow to avoid scrollbars during zoom */
+        position: relative; /* Set the position to relative for absolute positioning of the zoomed image */
+    }
+    .zoom-image {
+        transition: transform 0.5s ease; /* Smooth zoom transition */
+        width: 100%; /* Make sure the image fits its container */
+        transform-origin: center center; /* Default transform origin */
+    }
+    .page-header {
+    background-color: #007BFF; /* Blue background */
+    padding: 20px 0;
+    color: #fff;
+}
+
+.breadcrumb-wrap {
+    padding: 15px 0;
+}
+
+.breadcrumb a {
+    color: #ffffff; /* White text for links */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.breadcrumb a:hover {
+    color: #ffdd00; /* Yellow on hover */
+}
+
+.breadcrumb span {
+    color: #ffffff; /* White text for separators and current page */
+    margin: 0 5px;
+}
+
+</style>
+<div class="page-header breadcrumb-wrap">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'home' %}" rel="nofollow">Home</a>
+            <span>-></span>
+            <a href="{% url 'store' %}" rel="nofollow">Shop</a>
+            <span>-></span>
+            <span>{{ single_product.product_name }}</span>
+        </div>
+    </div>
+</div>
+
+<section class="section-content padding-y bg">
+    <div class="container">
+    
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="card">
+        <div class="row no-gutters">
+            <aside class="col-md-6">
+                <article class="gallery-wrap">
+                    <div class="img-big-wrap mainImage">
+                        <img src="{{ single_product.images.url }}" alt="Main Product Image" id="zoom-image">
+                    </div> <!-- img-big-wrap.// -->
+                </article>
+                <!-- gallery-wrap .end// -->
+                <div style="justify-content: space-between;">
+                    <ul class="thumb d-flex justify-content-center" id="productGallery">
+                        <!-- Display the main image -->
+                        <li class="mx-2">
+                            <a href="{{ single_product.images.url }}" target="mainImage">
+                                <img src="{{ single_product.images.url }}" alt="Main Product Image">
+                            </a>
+                        </li>
+                        {% if single_product.image1 %}
+                            <li class="mx-2">
+                                <a href="{{ single_product.image1.url }}" target="mainImage">
+                                    <img src="{{ single_product.image1.url }}" alt="Product Image 1">
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if single_product.image2 %}
+                            <li class="mx-2">
+                                <a href="{{ single_product.image2.url }}" target="mainImage">
+                                    <img src="{{ single_product.image2.url }}" alt="Product Image 2">
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if single_product.image3 %}
+                            <li class="mx-2">
+                                <a href="{{ single_product.image3.url }}" target="mainImage">
+                                    <img src="{{ single_product.image3.url }}" alt="Product Image 3">
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% for i in product_gallery %}
+                            <li class="mx-2">
+                                <a href="{{ i.image.url }}" target="mainImage">
+                                    <img src="{{ i.image.url }}" alt="Product Gallery Image">
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+            </aside>
+            
+            
+            <main class="col-md-6 border-left">
+                <form method="post" action="{% url 'add_cart' single_product.id %}" aria-label="Product Size Selection" id="size-selection-form">
+                    {% csrf_token %}
+                    <article class="content-body">
+                
+                        <h2 class="title">{{ single_product.product_name }}</h2>
+                        <a href="#" class="wishlist-icon" data-product-id="{{ single_product.id }}" onclick="toggleWishlist(event, this)">
+                            <i style="margin: 10px;" class="fa fa-heart text-secondary{% if single_product.wishlisted %} text-danger{% endif %}"></i>
+                        </a>
+                        <div class="rating-star">
+                            <span>
+                                <!-- Star Rating Display -->
+                                <i class="fa fa-star{% if single_product.averageReview < 0.5 %}-o{% elif single_product.averageReview >= 0.5 and single_product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.averageReview < 1.5 %}-o{% elif single_product.averageReview >= 1.5 and single_product.averageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.averageReview < 2.5 %}-o{% elif single_product.averageReview >= 2.5 and single_product.averageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.averageReview < 3.5 %}-o{% elif single_product.averageReview >= 3.5 and single_product.averageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.averageReview < 4.5 %}-o{% elif single_product.averageReview >= 4.5 and single_product.averageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <span>{{ single_product.countReview }} reviews</span>
+                            </span>
+                        </div>
+                        <div class="mb-3"> 
+                            <var class="price h4">₹{{ single_product.price }}</var>
+                            {% if single_product.discount_percentage > 0 %}
+                                <span style="padding-left: 8px;" class="old-price font-md ml-15">
+                                    <del>₹{{ single_product.old_price }}</del>
+                                </span>
+                                <span style="padding-left: 8px;" class="save-price font-md color3 ml-15">
+                                    {{ single_product.discount_percentage }}% Off
+                                </span>
+                            {% endif %}
+
+                        </div> 
+                        <p>{{ single_product.description }}</p>
+                        <hr>
+                    
+                        <h6>Select Size</h6>
+                
+                        <fieldset>
+                            <legend class="sr-only">Choose a size</legend>
+                            <div class="size-options">
+                                <input type="radio" id="small" name="size" value="Size 3" data-stock="{{ stock_small }}">
+                                <label for="small" class="size-label">Size 3</label>
+                
+                                <input type="radio" id="medium" name="size" value="Size 4" data-stock="{{ stock_medium }}">
+                                <label for="medium" class="size-label">Size 4</label>
+                
+                                <input type="radio" id="large" name="size" value="Size 5" data-stock="{{ stock_large }}">
+                                <label for="large" class="size-label">Size 5</label>
+                            </div>
+                
+                            <div class="stock-info">
+                                <p id="stock-count">Choose Size:-</p>
+                            </div>
+                
+                            <div class="error-message text-danger" id="size-error" style="display: none;">
+                                Please select a size.
+                            </div>
+                
+                            <hr>
+                
+                            {% if total_stock <= 0 %}
+                                <h5 class="text-danger">Out of Stock</h5>
+                            {% else %}
+                                <div class="button-container">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="text">Add to Cart</span>
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </fieldset>
+                    </article>
+                </form>
+                
+                    
+                    
+                    
+
+                    <style>
+  
+
+.button-container .btn {
+    width: 100%;
+    max-width: 520px;
+    padding: 12px;
+    font-size: 16px;
+}
+                    </style>
+                        
+                        
+            </main> <!-- col.// -->
+        </div> <!-- row.// -->
+    </div>
+    
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+    
+		<br>
+
+		<div class="row">
+			<div class="col-md-9">
+
+
+
+				<form action="{% url 'submit_review' single_product.id %}" method="POST">
+					{% csrf_token %}
+					<h5>Write Your Review</h5>
+
+					<div>
+						<!-- Rating stars -->
+						<label>How do you rate this product?</label>
+						<br>
+						<div class="rate">
+							<input type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
+							<input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
+							<input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
+							<input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
+							<input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
+							<input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
+							<input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
+							<input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
+							<input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
+							<input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
+						</div>
+<br>
+						Review Title:
+						<input type="text" class="form-control" name="subject">
+						<br>
+						Review:
+						<textarea name="review" rows="4" class="form-control"></textarea>
+						<br>
+						{% if user.is_authenticated %}
+							{% if orderproduct %}
+								<input type="submit" value="Submit Review" class="btn btn-primary">
+							{% else %}
+								<p>You must purchase this product to post a review.</p>
+							{% endif %}
+						{% else %}
+						<p>You must be logged in to post a review. <span><a href="{% url 'login' %}">Login now</a></span></p>
+						{% endif %}
+
+					</div>
+{% include 'includes/alerts.html' %}
+				</form>
+<br>
+<header class="section-heading">
+	<h3>Customer Reviews </h3>
+	<div class="rating-star">
+		<span>
+			<i class="fa fa-star{% if single_product.averageReview < 0.5 %}-o{% elif single_product.averageReview >= 0.5 and single_product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 1.5 %}-o{% elif single_product.averageReview >= 1.5 and single_product.averageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 2.5 %}-o{% elif single_product.averageReview >= 2.5 and single_product.averageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 3.5 %}-o{% elif single_product.averageReview >= 3.5 and single_product.averageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 4.5 %}-o{% elif single_product.averageReview >= 4.5 and single_product.averageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+	<span>{{single_product.countReview}} reviews</span>
+			</span>
+	</div>
+
+</header>
+
+{% for review in reviews %}
+				<article class="box mb-3">
+					<div class="icontext w-100">
+
+						<div class="text">
+							<span class="date text-muted float-md-right">{{review.updated_at}} </span>
+							<h6 class="mb-1">{{review.user.full_name}} </h6>
+							<div class="rating-star">
+								<span>
+									<i class="fa fa-star{% if review.rating == 0.5 %}-half-o{% elif review.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 1.5 %}-half-o{% elif review.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 2.5 %}-half-o{% elif review.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 3.5 %}-half-o{% elif review.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 4.5 %}-half-o{% elif review.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
+								</span>
+							</div>
+						</div>
+					</div> <!-- icontext.// -->
+					<div class="mt-3">
+						<h6>{{review.subject}}</h6>
+						<p>
+							{{review.review}}
+						</p>
+					</div>
+				</article>
+{% endfor %}
+
+
+			</div> <!-- col.// -->
+		</div> <!-- row.// -->
+
+
+	</div> <!-- container .//  -->
+</section>
+   
+<!-- ========================= SECTION CONTENT END// ========================= -->
+<section class="section-name padding-y-sm">
+    <div class="container">
+    
+    <header class="section-heading">
+        <a href="{% url 'store' %}" class="btn btn-outline-primary float-right">See all</a>
+        <h3 class="section-title">Related Products</h3>
+    </header><!-- sect-heading -->
+    
+    <div class="row">
+        {% for product in related_products %}
+    <div class="col-md-3">
+        <figure class="card card-product-grid">
+            <!-- Image Wrapper -->
+            <div class="img-wrap">
+                <a href="{{ product.get_url }}">
+                    <img src="{{ product.images.url }}" alt="{{ product.product_name }}" class="img-fluid rounded">
+                </a>
+            </div> <!-- img-wrap.// -->
+
+            <a href="#" class="wishlist-icon" data-product-id="{{ product.id }}" onclick="toggleWishlist(event, this)">
+                <i style="margin: 10px;" class="fa fa-heart text-secondary{% if product.wishlisted %} text-danger{% endif %}"></i>
+            </a>
+            
+
+            <!-- Product Info -->
+            <figcaption class="info-wrap">
+                <div class="fix-height">
+                    <a href="{{ product.get_url }}" class="title text-truncate">{{ product.product_name }}</a>
+                    <div class="price-wrap mt-2 d-flex justify-content-between align-items-center">
+                        <span class="price">₹{{ product.price }}</span>
+                        <!-- Optional: You can include stock information if available -->
+                        <!-- <span class="stock text-muted" style="font-size: 11px;">{{ product.get_total_stock }} stock left</span> -->
+                    </div>
+
+                    <!-- Rating Stars -->
+                    <div class="rating-star mt-2">
+                        <span>
+                            <i class="fa fa-star{% if product.averageReview < 0.5 %}-o{% elif product.averageReview >= 0.5 and product.averageReview < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if product.averageReview < 1.5 %}-o{% elif product.averageReview >= 1.5 and product.averageReview < 2 %}-half-o{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if product.averageReview < 2.5 %}-o{% elif product.averageReview >= 2.5 and product.averageReview < 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if product.averageReview < 3.5 %}-o{% elif product.averageReview >= 3.5 and product.averageReview < 4 %}-half-o{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if product.averageReview < 4.5 %}-o{% elif product.averageReview >= 4.5 and product.averageReview < 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                </div>
+                <!-- View Details Button -->
+                <a href="{{ product.get_url }}" class="btn btn-block btn-primary mt-3">View Details</a>
+            </figcaption>
+        </figure>
+    </div>
+    <!-- col.// -->
+{% empty %}
+    <p>No related products found.</p>
+{% endfor %}
+
+
+    </div> <!-- row.// -->
+    
+    </div><!-- container // -->
+</section>
+<style>
+    .thumb {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.thumb li {
+    margin: 5px; /* Adjust spacing between images */
+}
+
+.thumb img {
+    width: 100px; /* Adjust width as needed */
+    height: auto; /* Maintain aspect ratio */
+    display: block;
+}
+ul.thumb {
+    margin: 0 auto;
+    padding: 0;
+    float: unset;
+}
+
+
+</style>
+<style>
+    /* Highlight CSS */
+    .highlighted img {
+        border: 10px solid #007bff;
+    }
+</style>
+<script>
+    // JavaScript to handle click event and apply highlighting
+    document.querySelectorAll('#productGallery li a').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            // Remove 'highlighted' class from all list items
+            document.querySelectorAll('#productGallery li').forEach(function(li) {
+                li.classList.remove('highlighted');
+            });
+
+            // Add 'highlighted' class to the clicked item
+            this.parentElement.classList.add('highlighted');
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const zoomImage = document.getElementById('zoomImage');
+        const imgBigWrap = document.querySelector('.img-big-wrap');
+
+        imgBigWrap.addEventListener('mousemove', function(e) {
+            const rect = imgBigWrap.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const xPercent = (x / rect.width) * 100;
+            const yPercent = (y / rect.height) * 100;
+
+            zoomImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            zoomImage.style.transform = 'scale(1.5)';
+        });
+
+        imgBigWrap.addEventListener('mouseleave', function() {
+            zoomImage.style.transformOrigin = 'center center';
+            zoomImage.style.transform = 'scale(1)';
+        });
+    });
+</script>
+<style>
+    /* Container holding the main image */
+    .gallery-wrap {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 500px; /* Set the maximum width of the container */
+        margin: auto;
+    }
+
+    /* Main image container styling */
+    .img-big-wrap {
+        display: flex;
+        justify-content: center; /* Center the image horizontally */
+        align-items: center;     /* Center the image vertically */
+        width: 100%;
+        height: 400px; /* Set a fixed height for the image container */
+        position: relative;
+    }
+
+    .img-big-wrap img {
+        max-width: 100%;
+        max-height: 100%;
+        transition: transform 0.3s ease;
+        transform-origin: center center; /* Initial transform origin */
+    }
+
+    /* Zoom effect on hover */
+    .img-big-wrap:hover img {
+        transform: scale(2); /* Adjust the zoom level (2x zoom here) */
+    }
+    .highlighted {
+    border: 2px solid blue; /* Blue border */
+    padding: 4px; /* Add some space inside the image */
+    margin: 4px; /* Add some space outside the image */
+}
+
+</style>
+<script>
+    // JavaScript for mouse-follow zoom effect
+    const zoomImage = document.getElementById('zoom-image');
+    const imgWrap = document.querySelector('.img-big-wrap');
+
+    imgWrap.addEventListener('mousemove', function (e) {
+        const { left, top, width, height } = imgWrap.getBoundingClientRect();
+        const x = ((e.clientX - left) / width) * 100;
+        const y = ((e.clientY - top) / height) * 100;
+
+        zoomImage.style.transformOrigin = `${x}% ${y}%`;
+    });
+
+    imgWrap.addEventListener('mouseleave', function () {
+        zoomImage.style.transformOrigin = 'center center'; // Reset to center on mouse leave
+    });
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const thumbnails = document.querySelectorAll("#productGallery li img");
+
+    thumbnails.forEach(function(thumb) {
+        thumb.addEventListener("click", function() {
+            // Remove the highlighted class from any previously selected thumbnail
+            thumbnails.forEach(function(img) {
+                img.classList.remove("highlighted");
+            });
+
+            // Add the highlighted class to the clicked thumbnail
+            this.classList.add("highlighted");
+        });
+    });
+});
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('size-selection-form');
+    const radios = document.querySelectorAll('input[name="size"]');
+    const stockCountElement = document.getElementById('stock-count');
+    const errorElement = document.getElementById('size-error');
+
+    // Update stock count display when a size is selected
+    radios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            const stock = parseInt(this.getAttribute('data-stock'), 10);
+
+            // Update stock count message and style based on the stock level
+            if (stock === 0) {
+                stockCountElement.textContent = 'Out of Stock';
+                stockCountElement.style.color = 'red';
+            } else if (stock > 0 && stock <= 9) {
+                stockCountElement.textContent = `Only ${stock} items left!`;
+                stockCountElement.style.color = 'red';
+            } else if (stock >= 10) {
+                stockCountElement.textContent = 'In Stock';
+                stockCountElement.style.color = 'green';
+            } else {
+                stockCountElement.textContent = `Stock: ${stock}`;
+                stockCountElement.style.color = 'black';
+            }
+
+            errorElement.style.display = 'none';  // Hide error when a size is selected
+        });
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function (e) {
+        let sizeSelected = false;
+        let stockAvailable = true;
+
+        radios.forEach(radio => {
+            if (radio.checked) {
+                sizeSelected = true;
+                const stock = parseInt(radio.getAttribute('data-stock'), 10);
+                if (stock <= 0) {
+                    stockAvailable = false;
+                }
+            }
+        });
+
+        if (!sizeSelected) {
+            e.preventDefault();  // Prevent form submission
+            errorElement.textContent = 'Please select a size.';  // Set error message
+            errorElement.style.display = 'block';  // Show error message
+        } else if (!stockAvailable) {
+            e.preventDefault();  // Prevent form submission
+            errorElement.textContent = 'This size is currently out of stock.';  // Set error message
+            errorElement.style.display = 'block';  // Show error message
+        }
+    });
+});
+</script>
+
+
+
+<style>
+    input[type="radio"] + label {
+        color: #000 !important; /* Ensure labels are black */
+    }
+
+    input[type="radio"]:checked + label {
+        color: #000 !important; /* Ensure the selected label is black */
+    }
+</style>
+
+<style>
+    /* General form styling */
+    form[aria-label="Product Size Selection"] {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+    
+    /* Size options styling */
+    .size-options {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .size-options input[type="radio"] {
+        display: none;
+    }
+    
+    .size-options label {
+        font-size: 14px;
+        padding: 12px 24px;
+        background-color: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+        text-align: center;
+        width: 100%;
+        max-width: 120px;
+    }
+    
+    .size-options input[type="radio"]:checked + label {
+        border-color: #007bff; /* Blue border for selected size */
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue shadow */
+    }
+    
+    /* Stock info styling */
+    .stock-info {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    /* Button styling */
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 320px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+    
+    .btn-primary .text {
+        margin-right: 10px;
+    }
+    
+    .text-danger {
+        color: #dc3545;
+        font-size: 18px;
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    </style>    
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- CSRF token retrieval script -->
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<!-- Wishlist Toggle Script -->
+<script>
+    function toggleWishlist(event, element) {
+        event.preventDefault(); // Prevent the page from scrolling to the top
+        const productId = element.getAttribute('data-product-id');
+        
+        axios.post(`/store/toggle-wishlist/${productId}/`, {}, {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            if (response.data.success) {
+                element.querySelector('i').classList.toggle('text-danger');
+            } else {
+                console.error(response.data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+<style>
+    .wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px; /* Adjust as needed */
+    height: 30px; /* Adjust as needed */
+    background-color: rgba(255, 255, 255, 0.7); /* Optional: Add a background to avoid layout shifts */
+    border-radius: 50%; /* Optional: For a round icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Adjust size as needed */
+    transition: color 0.3s; /* Smooth transition for color changes */
+}
+
+.wishlist-icon i {
+    font-size: inherit; /* Ensure the icon inherits the font size */
+}
+
+.wishlist-icon:hover {
+    background-color: rgba(255, 255, 255, 0.9); /* Optional: Slight change on hover */
+}
+
+</style>
+{% endblock %}

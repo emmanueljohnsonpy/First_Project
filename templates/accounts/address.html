@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="section-conten padding-y bg">
+    {% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+            <main class="col-md-9">
+                <div class="row">
+                    <aside class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Add Address</h4>
+                                <form action="{% url 'address' %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="full_name">Full name *</label>
+                                        <input type="text" id="full_name" name="full_name" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address">Address *</label>
+                                        <input type="text" id="address" name="address" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address_line2">Address line2</label>
+                                        <input type="text" id="address_line2" name="address_line2" class="form-control" oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City / Town *</label>
+                                        <input type="text" id="city" name="city" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State *</label>
+                                        <input type="text" id="state" name="state" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pincode">Pincode / ZIP *</label>
+                                        <input type="text" id="pincode" name="pincode" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone *</label>
+                                        <input type="text" id="phone" name="phone" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email address *</label>
+                                        <input type="email" id="email" name="email" class="form-control" required oninput="updateAddressPreview()">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add address</button>
+                                </form>
+                            </div>
+                        </div>
+                    </aside>
+                    
+                    <aside class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Saved Addresses</h4>
+                                
+                                {% for address in user_addresses %}
+                                <div class="address-card p-3 mb-3 border">
+                                    <p><strong>{{ address.full_name }}</strong></p>
+                                    <p>{{ address.address }}{{ address.address_line2|default:"" }}</p>
+                                    <p>{{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+                                    <p>Phone: {{ address.phone }}</p>
+                                    <p>Email: {{ address.email }}</p>
+                
+                                    <!-- Edit button -->
+                                    <div class="mt-2">
+                                        <a href="{% url 'edit_address' address.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                                        <form action="{% url 'delete_address_profile' address.id %}" method="POST" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ address.id }}">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal{{ address.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ address.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ address.id }}">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this address?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'delete_address_profile' address.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+                                    <hr>
+                                </div>
+                                {% empty %}
+                                    <p>No saved addresses found.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </aside>
+                
+
+                  
+                </div> <!-- row inside main.// -->
+            </main>
+        </div> <!-- main row.// -->
+    </div> <!-- container.// -->
+</section>
+
+{% endblock %}
+
+<script>
+function updateAddressPreview() {
+    document.getElementById('preview-full_name').textContent = document.getElementById('full_name').value;
+    document.getElementById('preview-address').textContent = document.getElementById('address').value;
+    document.getElementById('preview-address_line2').textContent = document.getElementById('address_line2').value;
+    document.getElementById('preview-city').textContent = document.getElementById('city').value;
+    document.getElementById('preview-state').textContent = document.getElementById('state').value;
+    document.getElementById('preview-pincode').textContent = document.getElementById('pincode').value;
+    document.getElementById('preview-phone').textContent = document.getElementById('phone').value;
+    document.getElementById('preview-email').textContent = document.getElementById('email').value;
+}
+</script>

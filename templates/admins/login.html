@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'admins/assets/imgs/theme/favicon.svg' %}">
+    <!-- Template CSS -->
+    <link href="{% static 'admins/assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+    <style>
+        .form-error {
+            color: red;
+            font-size: 0.875em;
+            margin-top: 0.25em;
+        }
+        .form-group {
+            margin-bottom: 1em;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section class="content-main mt-80 mb-80">
+            <div class="card mx-auto card-login">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Sign in</h4>
+
+                    <!-- Display Django messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form id="loginForm" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input id="username" name="email" class="form-control" placeholder="Username or email" type="text" >
+                            <div id="usernameError" class="form-error"></div>
+                        </div> <!-- form-group// -->
+                        <div class="form-group">
+                            <input id="password" name="password" class="form-control" placeholder="Password" type="password" >
+                            <div id="passwordError" class="form-error"></div>
+                        </div> <!-- form-group// -->
+
+                        <div class="mb-4">
+                            <button type="submit" class="btn btn-primary w-100"> Login </button>
+                        </div> <!-- form-group// -->
+                    </form>
+                </div>
+            </div>
+        </section>
+        <footer class="main-footer text-center">
+            <p class="font-xs">
+                <script>
+                document.write(new Date().getFullYear())
+                </script> ©, Evara - HTML Ecommerce Template .
+            </p>
+            <p class="font-xs mb-30">All rights reserved</p>
+        </footer>
+    </main>
+    <script src="{% static 'admins/assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'admins/assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'admins/assets/js/main.js' %}" type="text/javascript"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            var isValid = true;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Clear previous error messages
+            document.getElementById('usernameError').innerText = '';
+            document.getElementById('passwordError').innerText = '';
+
+            // Validate username
+            if (username.trim() === '') {
+                document.getElementById('usernameError').innerText = 'Username is required.';
+                isValid = false;
+            }
+
+            // Validate password
+            if (password.trim() === '') {
+                document.getElementById('passwordError').innerText = 'Password is required.';
+                isValid = false;
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+
+</html>

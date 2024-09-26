@@ -1,0 +1,150 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        
+        
+    </header>
+    
+
+    <section class="content-main">
+        {% if messages %}
+    <div class="alert-messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Products List</h2>
+                
+            </div>
+       
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <article class="itemlist" style="border-bottom: 0px;">
+                    <div class="row align-items-center">
+                        <div class="col col-check flex-grow-0">
+                            <!-- Optional checkbox column -->
+                        </div>
+                        <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                            <a class="itemside" href="#">
+                                <!-- Optional image column -->
+                                <div class="info">
+                                    <h6 class="mb-0">Product Name</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-price">
+                            <span>Old Price</span>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-status">
+                            <span>New Price</span>
+                        </div>
+                        <div class="col-lg-1 col-sm-2 col-4 col-date">
+                            <span>Offer</span>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-action text-center">
+                            <span>Action</span>
+                        </div>
+                        <div class="col-lg-1 col-sm-2 col-5"></div>
+                    </div>
+                </article>
+            </header> <!-- card-header end// -->
+        
+            <div class="card-body">
+                {% for product in products %}
+<article class="itemlist">
+    <div class="row align-items-center">
+        <div class="col col-check flex-grow-0">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox">
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+            <a class="itemside" href="{{ product.get_url }}">
+                <div class="left">
+                    {% if product.images %}
+                        <img src="{{ product.images.url }}" class="img-sm img-thumbnail" alt="Item">
+                    {% else %}
+                        <img src="{% static 'default_image.jpg' %}" class="img-sm img-thumbnail" alt="Default Image">
+                    {% endif %}
+                </div>
+                <div class="info">
+                    <h6 class="mb-0">{{ product.product_name }}</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-price">
+            <span>{{ product.old_price }}</span>
+        </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-status">
+            <span>{{product.price}}</span>
+        </div>
+        <div class="col-lg-1 col-sm-2 col-4 col-date">
+            <span>{{ product.discount_percentage }}%</span>
+        </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-action text-center">
+            <form method="POST" action="{% if product.product_disc_added == False %}{% url 'apply_offer_to_product' %}{% else %}{% url 'remove_offer_from_product' %}{% endif %}">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="hidden" name="offer_id" value="{{ selected_offer_id }}">
+                
+                {% if product.product_disc_added == False %}
+                    <button type="submit" class="btn btn-primary">Apply Offer</button>
+                {% else %}
+                    <button type="submit" class="btn btn-danger">Remove Offer</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</article>
+{% endfor %}
+
+            </div>
+            <!-- card-body end// -->
+        </div>
+        
+        <!-- card end// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script>2024 ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+<style>
+    .alert-out-of-stock {
+    background-color: red;
+    color: white;
+}
+
+</style>
+{% endblock content %}

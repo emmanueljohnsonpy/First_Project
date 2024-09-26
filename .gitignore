@@ -1,0 +1,93 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+*.pot
+*.pyc
+.DS_Store
+*.mo
+*.coverage
+.coverage.*
+*.log
+*.out
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pytest
+.cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Django static files
+/static/
+media/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.coveragerc
+*.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Translations
+*.pot
+*.po
+
+# Miscellaneous
+*.swp
+*~
+*.bak
+*.orig
+*.tmp
+*.log
+*.pid
+*.seed
+*.backup

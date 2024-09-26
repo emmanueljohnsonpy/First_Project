@@ -1,0 +1,261 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<main class="main-wrap">
+    <header class="main-header navbar">
+    </header>
+    <section class="content-main">
+        {% if messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order List </h2>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control">
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Payment method</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Date</th>
+                                <th scope="col" class="text-end"> Action </th>
+                                <th scope="col">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+    <tr>
+        <td>{{ order.order_number }}</td>
+        <td><b>{{ order.name }}</b></td>
+        <td>{{ order.email }}</td>
+        <td>₹{{ order.grand_total }}</td>
+        <td>
+            {% if order.payment_method == 'cash_on_delivery' %}
+              COD
+            {% elif order.payment_method == 'wallet' %}
+              Wallet
+            {% else %}
+              {{ order.payment_method }}
+            {% endif %}
+          </td>
+          
+        <td>
+            {% if order.status == 'Pending' or order.status == 'Return Pending' %}
+                                            <span class="badge badge-pill badge-soft-warning">{{ order.status }}</span> <!-- Yellow for Pending and Return Pending -->
+                                        {% elif order.status == 'Return Request' %}
+                                            <span class="badge badge-pill badge-soft-danger">{{order.status}}</span>
+                                        {% elif order.status == 'Cancelled' or order.status == 'Return Cancelled' or order.status == 'Payment Pending' %}
+                                            <span class="badge badge-pill badge-soft-danger">{{ order.status }}</span> <!-- Red for Cancelled and Return Cancelled -->
+                                        {% else %}
+                                            <span class="badge badge-pill badge-soft-success">{{ order.status }}</span> <!-- Default: Green for other statuses -->
+                                        {% endif %}
+        </td>
+        <td>{{ order.created_at|date:"d.m.Y" }}</td>
+        <td class="text-end">
+            <!-- Button trigger modal -->
+            <a href="#" class="btn btn-md rounded font-sm" data-toggle="modal" data-target="#statusModal" data-order-id="{{ order.id }}" data-current-status="{{ order.status }}">Change Status</a>
+            
+            <!-- Cancel Button Form -->
+            <form method="post" action="{% url 'change_order_status' order.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="Cancelled">
+                <button type="submit" class="btn btn-md rounded font-sm ">Cancel</button>
+            </form>
+            <td>
+                <form action="{% url 'order_detail_view' order.id %}" method="get">
+                    <button type="submit" class="btn btn-md rounded font-sm">Details</button>
+                </form>
+            </td>
+            
+        </td>
+    </tr>
+{% endfor %}
+
+                        
+                       
+                        
+
+                        </tbody>
+                    </table>
+                </div> <!-- table-responsive //end -->
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {% if orders.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ orders.previous_page_number }}" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+        
+                    {% for num in orders.paginator.page_range %}
+                        {% if orders.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num > orders.number|add:'-2' and num < orders.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if orders.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ orders.next_page_number }}" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script> ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+
+
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Change Order Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="statusForm" method="post" action="{% url 'change_order_status' 0 %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="order_id" name="order_id" value="">
+                    <div class="form-group">
+                        <label>Select Status</label>
+                        <div id="status-radios">
+                            {% for value, label in status_choices %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="status-{{ value }}" name="status" value="{{ value }}">
+                                    <label class="form-check-label" for="status-{{ value }}">
+                                        {{ label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 13px;">Update Status</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#statusModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var orderId = button.data('order-id'); // Extract info from data-* attributes
+        var currentStatus = button.data('current-status'); // Current status to pre-select
+        
+        var modal = $(this);
+        var form = modal.find('form');
+        
+        form.attr('action', form.attr('action').replace('0', orderId));
+        modal.find('#order_id').val(orderId);
+        
+        // Uncheck all radio buttons
+        modal.find('input[name="status"]').prop('checked', false);
+        
+        // Check the radio button that matches the current status
+        if (currentStatus) {
+            modal.find('input[name="status"][value="' + currentStatus + '"]').prop('checked', true);
+        }
+    });
+</script>
+
+<script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all alert messages
+        var alertList = document.querySelectorAll('.alert-dismissible');
+
+        // Loop through each alert
+        alertList.forEach(function (alert) {
+            // Set a timeout to auto close the alert after 4 seconds (4000 milliseconds)
+            setTimeout(function () {
+                var alertInstance = new bootstrap.Alert(alert);
+                alertInstance.close();
+            }, 4000); // 4000 milliseconds = 4 seconds
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#statusModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var orderId = button.data('order-id'); // Extract info from data-* attributes
+            var currentStatus = button.data('current-status');
+
+            var modal = $(this);
+            modal.find('.modal-body #order_id').val(orderId);
+            modal.find('.modal-body #current_status').text(currentStatus);
+        });
+    });
+</script>
+
+{% endblock content %}

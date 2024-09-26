@@ -1,0 +1,245 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        <div class="col-search">
+            <form class="searchform">
+                <div class="input-group">
+                    <input type="text" name="search" placeholder="Search Products" class="form-control bg-white">
+                </div>
+                <datalist id="search_terms">
+                    <option value="Products">
+                    </option><option value="New orders">
+                    </option><option value="Apple iphone">
+                    </option><option value="Ahmed Hassan">
+                </option></datalist>
+            </form>
+        </div>
+        <div class="col-nav">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link btn-icon" href="#">
+                        <i class="material-icons md-notifications animation-shake"></i>
+                        <span class="badge rounded-pill">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                        <a class="dropdown-item text-brand" href="#"><img src="{% static 'admins/assets/imgs/theme/flag-us.png' %}" alt="English">English</a>
+                        <a class="dropdown-item" href="#"><img src="{% static 'admins/assets/imgs/theme/flag-fr.png' %}" alt="Français">Français</a>
+                        <a class="dropdown-item" href="#"><img src="{% static 'admins/assets/imgs/theme/flag-jp.png' %}" alt="Français">日本語</a>
+                        <a class="dropdown-item" href="#"><img src="{% static 'admins/assets/imgs/theme/flag-cn.png' %}" alt="Français">中国人</a>
+                    </div>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="{% static 'admins/assets/imgs/people/avatar2.jpg' %}" alt="User"></a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </header>
+    
+
+    <section class="content-main">
+        {% if messages %}
+    <div class="alert-messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Products List</h2>
+                
+            </div>
+            <div>
+                <a href="{% url 'adminaddproduct' %}" class="btn btn-primary btn-sm rounded">Add product</a>
+            </div>
+            
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                
+                <article class="itemlist"  style="border-bottom: 0px;">
+                    <div class="row align-items-center">
+                        <div class="col col-check flex-grow-0">
+                            <!-- <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="">
+                            </div> -->
+                        </div>
+                        <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                            <a class="itemside" href="#">
+                                <!-- <div class="left">
+                                    <img src="/admin/assets/imgs/items/2.jpg" class="img-sm img-thumbnail" alt="Item">
+                                </div> -->
+                                <div class="info">
+                                    <h6 class="mb-0">Product Name</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>Price</span> </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-status">
+                            <span>Status</span>
+                        </div>
+                        <div class="col-lg-1 col-sm-2 col-4 ">
+                            <span>Total Stock</span>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-action text-center">
+                            <a href="#">
+                                <i style="text-align: left;"></i>Action
+                            </a>
+                            <!-- <a href="#" class="btn btn-sm font-sm btn-light rounded">
+                                <i class="material-icons md-delete_forever"></i> Delete
+                            </a> -->
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-5"></div>
+                    </div> 
+                </article>
+            </header> <!-- card-header end// -->
+            
+            <div class="card-body">
+                {% for product in products %}
+                <article class="itemlist">
+                    <div class="row align-items-center">
+                        <div class="col col-check flex-grow-0">
+                            <div class="form-check">
+                                <!-- <input class="form-check-input" type="checkbox"> -->
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                            <a class="itemside" href="#">
+                                <div class="left">
+                                    <img src="{{ product.images.url }}" class="img-sm img-thumbnail" alt="Item">
+                                </div>
+                                <div class="info">
+                                    <h6 class="mb-0">{{ product.product_name }}</h6>
+                              
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-price">
+                            <span>{{ product.price }}</span>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-status">
+                            <span class="badge rounded-pill {% if not product.is_available %}alert-danger{% else %}alert-success{% endif %}">
+                                {% if product.is_available %}Available{% else %}Unavailable{% endif %}
+                            </span>
+                        </div>
+                        <div class="col-lg-1 col-sm-2 col-4 col-date">
+                            <span>{{ product.stock }}</span>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+                            <a href="{% url 'admineditproducts' product.id %}" class="btn btn-sm font-sm rounded btn-brand">
+                                <i class="material-icons md-edit"></i> Edit
+                            </a>
+                            <form method="POST" action="{% url 'toggle_product_status' product.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                {% if product.is_available %}
+                                    <button type="submit" class="btn btn-sm font-sm btn-light rounded">
+                                        <i class="material-icons md-delete_forever"></i> Disable
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm font-sm btn-light rounded">
+                                        <i class="material-icons md-add"></i> Enable
+                                    </button>
+                                {% endif %}
+                            </form>
+                        </div>
+                        
+                    </div> <!-- row .// -->
+                </article> <!-- itemlist  .// -->
+                {% endfor %}
+            </div>
+             <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+        
+                    {% for num in products.paginator.page_range %}
+                        {% if products.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num > products.number|add:'-2' and num < products.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+        
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script>2024 ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+<style>
+    .alert-out-of-stock {
+    background-color: red;
+    color: white;
+}
+
+</style>
+{% endblock content %}

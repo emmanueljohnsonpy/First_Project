@@ -1,0 +1,38 @@
+<aside class="col-md-3">
+    <!-- SIDEBAR -->
+    <ul class="list-group">
+        <a class="list-group-item {% if '/accounts/' == request.path %} active {% endif %}" href="{% url 'dashboard' %}"> Dashboard </a>
+        <a class="list-group-item {% if request.resolver_match.url_name == 'my_orders' or request.resolver_match.url_name == 'retry_page' %} active {% endif %}" href="{% url 'my_orders' %}"> Orders </a>
+        <a class="list-group-item {% if '/address/' in request.path %} active {% endif %}" href="{% url 'address' %}"> Address </a>
+        <a class="list-group-item {% if '/ac_details/' in request.path %} active {% endif %}" href="{% url 'ac_details' %}"> Account Details </a>
+        <a class="list-group-item {% if '/wallet/' in request.path %} active {% endif %}" href="{% url 'wallet' %}"> Wallet </a>
+        <!-- Additional links -->
+    </ul>
+    <br>
+    <!-- Logout Button -->
+    <a class="btn btn-light btn-block" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+        <i class="fa fa-power-off"></i> <span class="text">Log out</span>
+    </a>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to log out?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Include Bootstrap JavaScript (if not already included) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>

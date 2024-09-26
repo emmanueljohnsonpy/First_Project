@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block content %}
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y" style="min-height:84vh">
+
+    <!-- ============================ COMPONENT LOGIN ================================= -->
+
+    {% if request.GET.command == 'verification' %}
+
+    <div class="container mx-auto alert-info text-center" role="alert" style="max-width: 1024px; margin-top:100px;">
+        Thank you for registering with us. We have sent you a verification email to your email address [{{request.GET.email}}]
+        <br><br>
+        Already verified? <a href="{% url 'login' %}">Login</a>
+    </div>
+
+    {% else %}
+
+    <div class="card mx-auto" style="max-width: 380px; margin-top:100px;">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Sign in</h4>
+            {% include 'includes/alerts.html' %}
+            <form id="loginForm" action="{% url 'login' %}" method="POST" novalidate>
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="email" class="form-control" placeholder="Email Address" name="email" id="login_email" required>
+                    <small class="text-danger" id="email_error"></small>
+                </div> <!-- form-group// -->
+                <div class="form-group">
+                    <input type="password" class="form-control" placeholder="Password" name="password" id="login_password" required>
+                    <small class="text-danger" id="password_error"></small>
+                </div> <!-- form-group// -->
+                <div class="form-group">
+                    <a href="{% url 'forgotPassword' %}" class="float-right">Forgot password?</a>
+                </div> <!-- form-group form-check .// -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block"> Login </button>
+                </div> <!-- form-group// -->
+            </form>
+            <!-- Social Login Buttons -->
+            <div class="mt-4">
+                <a href="{% provider_login_url 'google' %}" class="btn btn-danger btn-block"><i class="fa fa-google"></i> Login with Google</a>
+                <!-- You can add more social login buttons here if needed -->
+            </div>
+        </div> <!-- card-body.// -->
+    </div> <!-- card .// -->
+
+    <p class="text-center mt-4">Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
+    <br><br>
+    <!-- ============================ COMPONENT LOGIN END.// ================================= -->
+    {% endif %}
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.querySelectorAll('.text-danger').forEach(function(error) {
+            error.textContent = '';
+        });
+
+        // Check email
+        const email = document.getElementById('login_email');
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim()) {
+            document.getElementById('email_error').textContent = 'Email is required';
+            isValid = false;
+        } else if (!emailPattern.test(email.value.trim())) {
+            document.getElementById('email_error').textContent = 'Invalid email format';
+            isValid = false;
+        }
+
+        // Check password
+        const password = document.getElementById('login_password');
+        if (!password.value.trim()) {
+            document.getElementById('password_error').textContent = 'Password is required';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+{% endblock %}

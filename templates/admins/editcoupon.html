@@ -1,0 +1,157 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        
+        <div class="col-nav">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+            </ul>
+        </div>
+    </header>
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Coupon</h2>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Edit Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="couponForm" action="{% url 'edit_coupon' coupon.id %}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="code" class="form-label">Coupon Code:</label>
+                                <input value="{{ coupon.code }}" type="text" id="code" name="code" class="form-control" placeholder="Coupon Code">
+                                <small class="text-danger" id="codeError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Description:</label>
+                                <input value="{{ coupon.description }}" type="text" id="description" name="description" class="form-control" placeholder="Description">
+                                <small class="text-danger" id="descriptionError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="discountPercentage" class="form-label">Discount Percentage:</label>
+                                <input value="{{ coupon.discount_percentage }}" type="number" id="discountPercentage" name="discountPercentage" class="form-control" min="0" max="99" step="0.01" placeholder="Discount Percentage">
+                                <small class="text-danger" id="discountError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="minPurchaseAmount" class="form-label">Minimum Purchase Amount:</label>
+                                <input value="{{ coupon.minimum_purchase_amount }}" type="number" id="minPurchaseAmount" name="minPurchaseAmount" class="form-control" min="0" step="0.01" placeholder="Minimum Purchase Amount">
+                                <small class="text-danger" id="minPurchaseError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="maxRedeemableValue" class="form-label">Max Redeemable Value:</label>
+                                <input value="{{ coupon.max_redeemable_value }}" type="number" id="maxRedeemableValue" name="maxRedeemableValue" class="form-control" min="0" step="0.01" placeholder="Max Redeemable Value">
+                                <small class="text-danger" id="maxRedeemableError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="quantity" class="form-label">Quantity:</label>
+                                <input value="{{ coupon.quantity }}" type="number" id="quantity" name="quantity" class="form-control" min="0" step="1" placeholder="Quantity">
+                                <small class="text-danger" id="quantityError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="expiryDate" class="form-label">Expiry Date:</label>
+                                <input value="{{ coupon.expiry_date|date:'Y-m-d' }}" type="date" id="expiryDate" name="expiryDate" class="form-control" required>
+                                <small class="text-danger" id="expiryDateError"></small>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Edit Coupon</button>
+                            </div>
+                        </form>
+                        
+                        
+                        <script>
+                          
+                            const COUPON_CODE_MIN_LENGTH = 8;  // Set your desired minimum length here
+                            const COUPON_CODE_MAX_LENGTH = 20; // Set your desired maximum length here
+                            const DESCRIPTION_MIN_LENGTH = 20; // Set your desired minimum length here
+                            const DESCRIPTION_MAX_LENGTH = 200; // Set your desired maximum length here
+
+                            document.getElementById('couponForm').addEventListener('submit', function(event) {
+                                let isValid = true;
+                                
+                                // Coupon Code validation
+                                const code = document.getElementById('code');
+                                if (code.value.length < COUPON_CODE_MIN_LENGTH || code.value.length > COUPON_CODE_MAX_LENGTH) {
+                                    document.getElementById('codeError').textContent = `Coupon code must be between ${COUPON_CODE_MIN_LENGTH} and ${COUPON_CODE_MAX_LENGTH} characters.`;
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('codeError').textContent = '';
+                                }
+                                
+                                // Description validation
+                                const description = document.getElementById('description');
+                                if (description.value.length < DESCRIPTION_MIN_LENGTH || description.value.length > DESCRIPTION_MAX_LENGTH) {
+                                    document.getElementById('descriptionError').textContent = `Description must be between ${DESCRIPTION_MIN_LENGTH} and ${DESCRIPTION_MAX_LENGTH} characters.`;
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('descriptionError').textContent = '';
+                                }
+                                
+                                // Discount Percentage validation
+                                const discountPercentage = document.getElementById('discountPercentage');
+                                if (discountPercentage.value < 0 || discountPercentage.value > 99 || !/^\d+(\.\d{1,2})?$/.test(discountPercentage.value)) {
+                                    document.getElementById('discountError').textContent = 'Discount must be between 0 and 99 with up to 2 decimal places.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('discountError').textContent = '';
+                                }
+                                
+                                // Minimum Purchase Amount validation
+                                const minPurchaseAmount = document.getElementById('minPurchaseAmount');
+                                if (minPurchaseAmount.value < 0 || !/^\d+(\.\d{1,2})?$/.test(minPurchaseAmount.value)) {
+                                    document.getElementById('minPurchaseError').textContent = 'Minimum purchase amount must be a positive number with up to 2 decimal places.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('minPurchaseError').textContent = '';
+                                }
+
+                                // Max Redeemable Value validation
+                                const maxRedeemableValue = document.getElementById('maxRedeemableValue');
+                                if (maxRedeemableValue.value < 0 || !/^\d+(\.\d{1,2})?$/.test(maxRedeemableValue.value)) {
+                                    document.getElementById('maxRedeemableError').textContent = 'Max redeemable value must be a positive number with up to 2 decimal places.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('maxRedeemableError').textContent = '';
+                                }
+                                
+                                // Quantity validation (Fixed)
+                                const quantity = document.getElementById('quantity');
+                                if (quantity.value === '' || quantity.value < 0 || !Number.isInteger(Number(quantity.value))) {
+                                    document.getElementById('quantityError').textContent = 'Quantity must be a non-negative integer.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('quantityError').textContent = '';
+                                }
+                                                
+                                // Expiry Date validation (Fixed)
+                                const expiryDate = document.getElementById('expiryDate');
+                                const currentDate = new Date();
+                                currentDate.setHours(0, 0, 0, 0);  // Set time to midnight for date comparison
+                                if (expiryDate.value === '' || new Date(expiryDate.value) < currentDate) {
+                                    document.getElementById('expiryDateError').textContent = 'Expiry date must be today or in the future.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('expiryDateError').textContent = '';
+                                }
+                                
+                                if (!isValid) {
+                                    event.preventDefault();
+                                }
+                            });
+                        </script>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

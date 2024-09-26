@@ -1,0 +1,99 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        
+        <div class="col-nav">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+            </ul>
+        </div>
+    </header>
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Product Offer</h2>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Edit Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="offerForm" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="offer_id" value="{{ offer.id }}">
+                        
+                            <div class="mb-4">
+                                <label for="offer_name" class="form-label">Offer Name:</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="offer_name" name="offer_name" value="{{ offer.offer_name }}">
+                                <div id="offer_name_error" class="text-danger"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Description:</label>
+                                <textarea placeholder="Type here" class="form-control" id="description" name="description" rows="4">{{ offer.description }}</textarea>
+                                <div id="description_error" class="text-danger"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="offer_percentage" class="form-label">Offer Percentage:</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="offer_percentage" name="offer_percentage" value="{{ offer.offer_percentage }}">
+                                <div id="offer_percentage_error" class="text-danger"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="offer_type" class="form-label">Offer Type:</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="offer_type" name="offer_type" value="Product" disabled>
+                            </div>
+                        
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                        
+                        
+                        <script>
+                            document.getElementById('offerForm').addEventListener('submit', function(event) {
+                                let isValid = true;
+                        
+                                // Clear previous error messages
+                                document.getElementById('offer_name_error').innerText = '';
+                                document.getElementById('description_error').innerText = '';
+                                document.getElementById('offer_percentage_error').innerText = '';
+                        
+                                // Validate Offer Name
+                                const offerName = document.getElementById('offer_name').value.trim();
+                                if (offerName.length < 1) {
+                                    document.getElementById('offer_name_error').innerText = 'Offer Name is required.';
+                                    isValid = false;
+                                }
+                        
+                                // Validate Description
+                                const description = document.getElementById('description').value.trim();
+                                if (description.length < 10) {
+                                    document.getElementById('description_error').innerText = 'Description must be at least 10 characters long.';
+                                    isValid = false;
+                                }
+                        
+                                // Validate Offer Percentage
+                                const offerPercentage = document.getElementById('offer_percentage').value.trim();
+                                const percentageRegex = /^[0-9]{1,2}(\.[0-9]{1,2})?$/;
+                                if (!offerPercentage.match(percentageRegex) || parseFloat(offerPercentage) <= 0) {
+                                    document.getElementById('offer_percentage_error').innerText = 'Offer Percentage must be a positive number with up to two decimal places.';
+                                    isValid = false;
+                                }
+                        
+                                // Prevent form submission if validation fails
+                                if (!isValid) {
+                                    event.preventDefault();
+                                }
+                            });
+                        </script>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

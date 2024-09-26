@@ -1,0 +1,299 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<section class="content-main">
+        <main class="main-wrap">
+            {% if messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="content-header">
+
+
+            <div>
+              
+                <h2 class="content-title card-title">Order details</h2>
+                <!-- <p>Add, edit or delete a coupon</p> -->
+            </div>
+            
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                        <span>
+                            <i class="material-icons md-calendar_today"></i> <b>{{ order.created_at }}</b>
+                        </span> <br>
+                        <small class="text-muted">Order ID: {{ order.order_number }}</small>
+                    </div>
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <a href="#" class="btn btn-md rounded font-sm" data-toggle="modal" data-target="#statusModal" data-order-id="{{ order.id }}" data-current-status="{{ order.status }}">Change Status</a>
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-person"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Customer</h6>
+                                <p class="mb-1">
+                                    {{order.name}} <br> {{order.email}} <br> {{order.user.phone_number}}
+                                </p>
+                               
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-local_shipping"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Order info</h6>
+                                <p class="mb-1">
+                                    Shipping: Fargo express <br> Pay method: card <br> Status: new
+                                </p>
+                                <a href="#">Download info</a>
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-place"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Deliver to</h6>
+                              
+    <p class="mb-1">
+        
+        {{ order.address_line1 }} <br>
+        {{ order.address_line2 }} <br>
+        Pincode :- {{ order.pincode }}<br>
+        City: {{ order.city }}, {{ order.state }} <br>
+    </p>
+  
+   
+
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                </div> <!-- row // -->
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">Product</th>
+                                        <th width="40%">Size</th>
+                                        <th width="20%">Unit Price</th>
+                                        <th width="20%">Quantity</th>
+                                        <th width="20%" class="text-end">Total</th>
+                                    </tr>
+                                    
+                                </thead>
+                                <tbody>
+                                    
+                                   
+                                    {% for item in aggregated_items %}
+                                    
+        <tr>
+            <td>
+                <a class="itemside" href="#">
+                    <div class="left">
+                        <!-- Assuming you have a field for product images in your Product model -->
+                        <!-- <img src="{{item.product__image1}}"> -->
+                        <!-- <img src="data:image/jpeg;base64,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" width="40" height="40" class="img-xs" alt="{{ item.product__product_name }}"> -->
+                    </div>
+                   
+                    <div class="info">
+                        {{ item.product__product_name }}
+                    </div>
+                </a>
+            </td>
+            <td>{{ item.size }}</td>
+            <td>₹{{ item.unit_price }}</td>
+            <td>{{ item.total_quantity }}</td>
+            <td class="text-end">₹{{ item.total_price }}</td>
+        </tr>
+        
+        {% empty %}
+        <tr>
+            <td colspan="5">No items found</td>
+        </tr>
+        {% endfor %}
+
+                            
+
+                            
+
+
+                                    <tr>
+                                        <td colspan="4">
+                                            <article class="float-end">
+                                                <dl class="dlist">
+                                                    <dt>Total price:</dt>
+                                                    <dd>₹{{order.total_price}}</dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Tax:</dt>
+                                                    <dd>₹{{order.tax}}</dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Shipping Fee:</dt>
+                                                    <dd>₹{{order.shipping_fee}}</dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Grand total:</dt>
+                                                    <dd> <b class="h5">₹{{order.grand_total}}</b> </dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt class="text-muted">Status:</dt>
+                                                    <dd>
+                                                        {% if order.status == 'Pending' or order.status == 'Return Pending' %}
+                                            <span class="badge badge-pill badge-soft-warning">{{ order.status }}</span> <!-- Yellow for Pending and Return Pending -->
+                                        {% elif order.status == 'Cancelled' or order.status == 'Return Cancelled' or order.status == 'Payment Pending' %}
+                                            <span class="badge badge-pill badge-soft-danger">{{ order.status }}</span> <!-- Red for Cancelled and Return Cancelled -->
+                                        {% else %}
+                                            <span class="badge badge-pill badge-soft-success">{{ order.status }}</span> <!-- Default: Green for other statuses -->
+                                        {% endif %}
+                                                    </dd>
+                                                </dl>
+                                            </article>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div> <!-- table-responsive// -->
+                        
+                       
+                    </div> <!-- col// -->
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-4">
+                        <div class="box shadow-sm bg-light">
+                            <h6 class="mb-15">Payment Method</h6>
+                            <p>
+                                <i class="material-icons md-payment font-xxl text-muted mr-5"></i>{% if order.payment_method == "cash_on_delivery" %}
+                                COD
+                            {% elif order.payment_method == "wallet" %}
+                                Wallet
+                            {% else %}
+                                {{ order.payment_method }}
+                            {% endif %}
+                            
+                            </p>
+                        </div>
+                        <div class="h-25 pt-4">
+                            
+                            
+                        </div>
+                    </div> <!-- col// -->
+                </div>
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+    </section>
+</main>
+
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Change Order Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="statusForm" method="post" action="{% url 'change_order_status_view' 0 %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="order_id" name="order_id" value="">
+                    <div class="form-group">
+                        <label>Select Status</label>
+                        <div id="status-radios">
+                            {% for value, label in status_choices %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="status-{{ value }}" name="status" value="{{ value }}">
+                                    <label class="form-check-label" for="status-{{ value }}">
+                                        {{ label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 13px;">Update Status</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#statusModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var orderId = button.data('order-id'); // Extract info from data-* attributes
+        var currentStatus = button.data('current-status'); // Current status to pre-select
+        
+        var modal = $(this);
+        var form = modal.find('form');
+        
+        form.attr('action', form.attr('action').replace('0', orderId));
+        modal.find('#order_id').val(orderId);
+        
+        // Uncheck all radio buttons
+        modal.find('input[name="status"]').prop('checked', false);
+        
+        // Check the radio button that matches the current status
+        if (currentStatus) {
+            modal.find('input[name="status"][value="' + currentStatus + '"]').prop('checked', true);
+        }
+    });
+</script>
+
+<script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all alert messages
+        var alertList = document.querySelectorAll('.alert-dismissible');
+
+        // Loop through each alert
+        alertList.forEach(function (alert) {
+            // Set a timeout to auto close the alert after 4 seconds (4000 milliseconds)
+            setTimeout(function () {
+                var alertInstance = new bootstrap.Alert(alert);
+                alertInstance.close();
+            }, 4000); // 4000 milliseconds = 4 seconds
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#statusModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var orderId = button.data('order-id'); // Extract info from data-* attributes
+            var currentStatus = button.data('current-status');
+
+            var modal = $(this);
+            modal.find('.modal-body #order_id').val(orderId);
+            modal.find('.modal-body #current_status').text(currentStatus);
+        });
+    });
+</script>
+{% endblock content %}

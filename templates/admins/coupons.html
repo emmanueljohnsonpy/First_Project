@@ -1,0 +1,273 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+        <main class="main-wrap">
+            {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+                var backgroundColor = "{{ message.extra_tags }}" === "error" ? "#f44336" : "#4CAF50";
+                Toastify({
+                    text: "{{ message }}",
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: backgroundColor,
+                    stopOnFocus: true
+                }).showToast();
+            {% endfor %}
+        });
+    </script>
+{% endif %}
+
+        
+
+
+        <div class="content-header">
+
+
+            <div>
+              
+                <h2 class="content-title card-title">Coupons</h2>
+                <!-- <p>Add, edit or delete a coupon</p> -->
+            </div>
+            <form method="GET" action="{% url 'admincoupons' %}">
+                <div class="input-group">
+                    <input type="text" name="search" placeholder="Search Coupons" class="form-control bg-white" value="{{ request.GET.search }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <form id="couponForm" action="{% url 'create_coupon' %}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="code" class="form-label">Coupon Code:</label>
+                                <input placeholder="Coupon Code" type="text" id="code" name="code" class="form-control" >
+                                <small class="text-danger" id="codeError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Description:</label>
+                                <input placeholder="Description" type="text" id="description" name="description" class="form-control" >
+                                <small class="text-danger" id="descriptionError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="discountPercentage" class="form-label">Discount Percentage:</label>
+                                <input placeholder="Discount Percentage" type="number" id="discountPercentage" name="discountPercentage" class="form-control"  min="0" max="99" step="0.01">
+                                <small class="text-danger" id="discountError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="minPurchaseAmount" class="form-label">Minimum Purchase Amount:</label>
+                                <input placeholder="Minimum Purchase Amount" type="number" id="minPurchaseAmount" name="minPurchaseAmount" class="form-control"  min="0" step="0.01">
+                                <small class="text-danger" id="minPurchaseError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="maxRedeemableValue" class="form-label">Max Redeemable Value:</label>
+                                <input placeholder="Max Redeemable Value" type="number" id="maxRedeemableValue" name="maxRedeemableValue" class="form-control" min="0" step="0.01">
+                                <small class="text-danger" id="maxRedeemableError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="quantity" class="form-label">Quantity:</label>
+                                <input placeholder="Quantity" type="number" id="quantity" name="quantity" class="form-control" min="0" step="1">
+                                <small class="text-danger" id="quantityError"></small>
+                            </div>
+                            <div class="mb-4">
+                                <label for="expiryDate" class="form-label">Expiry Date:</label>
+                                <input placeholder="Expiry Date" type="date" id="expiryDate" name="expiryDate" class="form-control" >
+                                <small class="text-danger" id="expiryDateError"></small>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Create Coupon</button>
+                            </div>
+                        </form>
+                        
+                        <script>
+                         
+                    const COUPON_CODE_MIN_LENGTH = 8;  // Set your desired minimum length here
+                    const COUPON_CODE_MAX_LENGTH = 20; // Set your desired maximum length here
+                    const DESCRIPTION_MIN_LENGTH = 20; // Set your desired minimum length here
+                    const DESCRIPTION_MAX_LENGTH = 200; // Set your desired maximum length here
+
+                    document.getElementById('couponForm').addEventListener('submit', function(event) {
+                        let isValid = true;
+                        
+                        // Coupon Code validation
+                        const code = document.getElementById('code');
+                        if (code.value.length < COUPON_CODE_MIN_LENGTH || code.value.length > COUPON_CODE_MAX_LENGTH) {
+                            document.getElementById('codeError').textContent = `Coupon code must be between ${COUPON_CODE_MIN_LENGTH} and ${COUPON_CODE_MAX_LENGTH} characters.`;
+                            isValid = false;
+                        } else {
+                            document.getElementById('codeError').textContent = '';
+                        }
+                        
+                        // Description validation
+                        const description = document.getElementById('description');
+                        if (description.value.length < DESCRIPTION_MIN_LENGTH || description.value.length > DESCRIPTION_MAX_LENGTH) {
+                            document.getElementById('descriptionError').textContent = `Description must be between ${DESCRIPTION_MIN_LENGTH} and ${DESCRIPTION_MAX_LENGTH} characters.`;
+                            isValid = false;
+                        } else {
+                            document.getElementById('descriptionError').textContent = '';
+                        }
+                        
+                        // Discount Percentage validation
+                        const discountPercentage = document.getElementById('discountPercentage');
+                        if (discountPercentage.value < 0 || discountPercentage.value > 99 || !/^\d+(\.\d{1,2})?$/.test(discountPercentage.value)) {
+                            document.getElementById('discountError').textContent = 'Discount must be between 0 and 99 with up to 2 decimal places.';
+                            isValid = false;
+                        } else {
+                            document.getElementById('discountError').textContent = '';
+                        }
+                        
+                        // Minimum Purchase Amount validation
+                        const minPurchaseAmount = document.getElementById('minPurchaseAmount');
+                        if (minPurchaseAmount.value < 0 || !/^\d+(\.\d{1,2})?$/.test(minPurchaseAmount.value)) {
+                            document.getElementById('minPurchaseError').textContent = 'Minimum purchase amount must be a positive number with up to 2 decimal places.';
+                            isValid = false;
+                        } else {
+                            document.getElementById('minPurchaseError').textContent = '';
+                        }
+
+                        // Max Redeemable Value validation
+                        const maxRedeemableValue = document.getElementById('maxRedeemableValue');
+                        if (maxRedeemableValue.value < 0 || !/^\d+(\.\d{1,2})?$/.test(maxRedeemableValue.value)) {
+                            document.getElementById('maxRedeemableError').textContent = 'Max redeemable value must be a positive number with up to 2 decimal places.';
+                            isValid = false;
+                        } else {
+                            document.getElementById('maxRedeemableError').textContent = '';
+                        }
+                        
+                        // Quantity validation (Fixed)
+                        const quantity = document.getElementById('quantity');
+                        if (quantity.value === '' || quantity.value < 0 || !Number.isInteger(Number(quantity.value))) {
+                            document.getElementById('quantityError').textContent = 'Quantity must be a non-negative integer.';
+                            isValid = false;
+                        } else {
+                            document.getElementById('quantityError').textContent = '';
+                        }
+                                        
+                        // Expiry Date validation (Fixed)
+                        const expiryDate = document.getElementById('expiryDate');
+                        const currentDate = new Date();
+                        currentDate.setHours(0, 0, 0, 0);  // Set time to midnight for date comparison
+                        if (expiryDate.value === '' || new Date(expiryDate.value) < currentDate) {
+                            document.getElementById('expiryDateError').textContent = 'Expiry date must be today or in the future.';
+                            isValid = false;
+                        } else {
+                            document.getElementById('expiryDateError').textContent = '';
+                        }
+                        
+                        if (!isValid) {
+                            event.preventDefault();
+                        }
+                    });
+                                            </script>
+                        
+                        
+                      </div>
+                      <div class="col-md-9">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Coupon Code</th>
+                                        <th>Description</th>
+                                        <th>Discount <br> Percentage</th>
+                                        <th>Minimum Purchase <br> Amount</th>
+                                        <th>Max redeemable </th>
+                                        <th>Quantity</th>
+                                        <th>Expiry Date</th>
+                                        <th>Status</th>
+                                        <th>Edit</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for coupon in coupons %}
+                                    <tr>
+                                        <td>{{ coupon.code }}</td>
+                                        <td>{{ coupon.description }}</td>
+                                        <td>{{ coupon.discount_percentage }}%</td>
+                                        <td>₹{{ coupon.minimum_purchase_amount }}</td>
+                                        <td>₹{{ coupon.max_redeemable_value }}</td>
+                                        <td>{{ coupon.quantity }}</td>
+                                        <!-- <td>{{ coupon.quantity }}</td> -->
+                                        <td>{{ coupon.expiry_date }}</td>
+                                        <td>
+                                            <div id="activeStatus{{ coupon.id }}" class="col-status" style="display: inline-block;">
+                                                <span class="badge rounded-pill 
+                                                    {% if coupon.status == 'inactive' %}alert-danger
+                                                    {% elif coupon.status == 'active' %}alert-success
+                                                    {% elif coupon.status == 'expired' %}alert-warning{% endif %}">
+                                                    {{ coupon.get_status_display }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'edit_coupon' coupon.id %}" class="btn btn-sm btn-brand rounded font-sm">Edit</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <form method="post" action="{% url 'toggle_coupon_status' coupon.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button style="width: 100px; height: 30px;" type="submit" class="btn btn-sm btn-brand rounded font-sm">
+                                                    {{ coupon.get_action_display }}
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No coupons available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {% if coupons.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ coupons.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for i in coupons.paginator.page_range %}
+                        {% if coupons.number == i %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > coupons.number|add:'-3' and i < coupons.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if coupons.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ coupons.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </section>
+</main>
+{% endblock content %}

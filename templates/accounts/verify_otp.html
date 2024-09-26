@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <br>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #timer {
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+        #resend-otp {
+            background-color: #28a745;
+            border: none;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #resend-otp:hover {
+            background-color: #218838;
+        }
+        .alert {
+            color: #dc3545;
+            font-size: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="container">
+        <h1>Verify OTP</h1>
+       
+        <form method="post">
+            {% csrf_token %}
+            <label for="otp">Enter OTP:</label>
+            <input type="text" name="otp" id="otp" required>
+            {% if messages %}
+            <div id="messages" style="color: red;">
+                {% for message in messages %}
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <br> 
+        <br>
+            <button type="submit" style="margin-top: 5px;">Verify OTP</button>
+        </form>
+        <div id="timer"></div>
+        <button id="resend-otp" style="display:none;" onclick="resendOtp()">Resend OTP</button>
+        <div id="alert" class="alert"></div>
+    </div>
+
+    <!-- <script>
+        const expiryTime = 60; // seconds
+        let timeLeft = expiryTime;
+
+        function updateTimer() {
+            const timerElement = document.getElementById('timer');
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                timerElement.textContent = 'OTP expired';
+                document.getElementById('resend-otp').style.display = 'block';
+            } else {
+                setTimeout(updateTimer, 1000);
+            }
+        }
+
+        function resendOtp() {
+            const csrftoken = getCookie('csrftoken');
+
+            fetch('/resend-otp/', { 
+                method: 'POST', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                } 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('New OTP has been sent to your email.');
+                    timeLeft = expiryTime;
+                    document.getElementById('resend-otp').style.display = 'none';
+                    updateTimer();
+                } else {
+                    showAlert('Failed to resend OTP. Please try again.');
+                }
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function showAlert(message) {
+            const alertElement = document.getElementById('alert');
+            alertElement.textContent = message;
+        }
+
+        window.onload = updateTimer;
+    </script> -->
+    <script>
+        const expiryTime = 120; // seconds
+        let timeLeft;
+    
+        function updateTimer() {
+            const timerElement = document.getElementById('timer');
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeLeft--;
+    
+            if (timeLeft < 0) {
+                timerElement.textContent = 'OTP expired';
+                document.getElementById('resend-otp').style.display = 'block';
+                localStorage.removeItem('timeLeft'); // Remove timer from local storage when expired
+            } else {
+                localStorage.setItem('timeLeft', timeLeft); // Save remaining time in local storage
+                setTimeout(updateTimer, 1000);
+            }
+        }
+    
+        function resendOtp() {
+            const csrftoken = getCookie('csrftoken');
+    
+            fetch('/resend-otp/', { 
+                method: 'POST', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                } 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('New OTP has been sent to your email.');
+                    // Reset timeLeft only when OTP is successfully resent
+                    timeLeft = expiryTime;
+                    localStorage.setItem('timeLeft', timeLeft); // Update local storage with new timer
+                    document.getElementById('resend-otp').style.display = 'none';
+                    updateTimer();
+                } else {
+                    showAlert('Failed to resend OTP. Please try again.');
+                }
+            });
+        }
+    
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        function showAlert(message) {
+            const alertElement = document.getElementById('alert');
+            alertElement.textContent = message;
+        }
+    
+        window.onload = function() {
+            // Load timeLeft from local storage or set to expiryTime if not present
+            timeLeft = parseInt(localStorage.getItem('timeLeft'), 10);
+            if (isNaN(timeLeft) || timeLeft <= 0) {
+                timeLeft = expiryTime;
+            }
+            updateTimer();
+        };
+    </script>
+    
+</body>
+</html>

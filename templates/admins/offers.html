@@ -1,0 +1,258 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <header class="main-header navbar">
+        <div class="col-search">
+            <form class="searchform">
+                <div class="input-group">
+                    <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                    <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                </div>
+                <datalist id="search_terms">
+                    <option value="Products">
+                    </option><option value="New orders">
+                    </option><option value="Apple iphone">
+                    </option><option value="Ahmed Hassan">
+                </option></datalist>
+            </form>
+        </div>
+        <div class="col-nav">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link btn-icon" href="#">
+                        <i class="material-icons md-notifications animation-shake"></i>
+                        <span class="badge rounded-pill">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                        <a class="dropdown-item text-brand" href="#"><img src="/static/admin/assets/imgs/theme/flag-us.png" alt="English">English</a>
+                        <a class="dropdown-item" href="#"><img src="/static/admin/assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
+                        <a class="dropdown-item" href="#"><img src="/static/admin/assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
+                        <a class="dropdown-item" href="#"><img src="/static/admin/assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
+                    </div>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/static/admin/assets/imgs/people/avatar2.jpg" alt="User"></a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <section class="content-main">
+        {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            // Hide the alert after 4 seconds
+            setTimeout(function() {
+                let alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    let bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 4000); // 4000 milliseconds = 4 seconds
+        </script>
+    {% endif %}
+    
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Offers</h2>
+                <p>Add, edit or delete a offer</p>
+            </div>
+            <div>
+                <a href="{% url 'add_product_offer' %}" class="btn btn-primary btn-sm rounded">Add Product Offer</a>
+                <a href="{% url 'add_cat_offer' %}" class="btn btn-primary btn-sm rounded">Add Category Offer</a>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">Offer Name</div>
+                    <div class="col">Description</div>
+                    <div class="col">Type</div>
+                    <div class="col">Offer Percentage</div>
+                    <div class="col">Status</div>
+                    <div class="col">Add/Remove</div>
+                    <div class="col">Edit</div>
+                    <div class="col">Action</div>
+                </div>
+            </header>
+            <div class="card-body">
+                {% for offer in offers %}
+                <div class="row align-items-center mb-3">
+                    <div class="col">{{ offer.offer_name }}</div>
+                    <div class="col">{{ offer.description }}</div>
+                    <div class="col">{{ offer.offer_type|capfirst }}</div>
+                    <div class="col">{{ offer.offer_percentage }}%</div>
+                    <div class="col">
+                        {% if offer.status == 'active' %}
+                        <span class="badge rounded-pill alert-success">Active</span>
+                        {% else %}
+                        <span class="badge rounded-pill alert-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                   
+                    <div class="col">
+                        <form method="POST" action="{% url 'show_items' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="offer_id" value="{{ offer.id }}">
+                            {% if offer.offer_type == 'product' %}
+                                <button type="submit" name="view" value="products" class="btn btn-sm font-sm btn-light rounded">
+                                    <i class="material-icons md-edit"></i> Products
+                                </button>
+                            {% else %}
+                                <button type="submit" name="view" value="categories" class="btn btn-sm font-sm btn-light rounded">
+                                    <i class="material-icons md-edit"></i> Categories
+                                </button>
+                            {% endif %}
+                        </form>
+                        
+                        
+                    </div>
+                    
+                    
+                    <div class="col">
+                        <a href="{% url 'edit_product_offer' offer.id %}" class="btn btn-sm font-sm rounded btn-brand">
+                            <i class="material-icons md-edit"></i> Edit
+                        </a>
+                    </div>
+                    
+                    <div class="col">
+                        <form method="POST" action="{% url 'toggle_offer_status' offer.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm font-sm btn-light rounded">
+                                {% if offer.status == 'active' %}
+                                <i class="material-icons md-delete_forever"></i> Disable
+                                {% else %}
+                                <i class="material-icons md-undo"></i> Enable
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No offers available.</p>
+                {% endfor %}
+            </div>
+            
+            
+        </div>
+        <!-- Pagination area remains unchanged -->
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {% if offers.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ offers.previous_page_number }}" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Previous">
+                                <i class="material-icons md-chevron_left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+        
+                    {% for num in offers.paginator.page_range %}
+                        {% if offers.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num > offers.number|add:'-2' and num < offers.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if offers.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ offers.next_page_number }}" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        
+    </section>
+    <!-- Footer remains unchanged -->
+</main>
+<style>
+    .card-header .row div, .card-body .row div {
+        padding: 5px;
+        text-align: center;
+    }
+    .card-body .row {
+        border-bottom: 1px solid #eee;
+    }
+    .card-body .row:last-child {
+        border-bottom: none;
+    }
+</style>
+<!-- product_list_modal.html -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="productModalLabel">Products</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            {% for product in products %}
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  {% if product.image1 %}
+                    <img src="{{ product.image1.url }}" class="card-img-top" alt="{{ product.product_name }}">
+                  {% endif %}
+                  <div class="card-body">
+                    <h5 class="card-title">{{ product.product_name }}</h5>
+                    <p class="card-text">{{ product.description }}</p>
+                    <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                    <button class="btn btn-primary apply-offer" data-id="{{ product.id }}">Apply Offer</button>
+                    <button class="btn btn-secondary remove-offer" data-id="{{ product.id }}">Remove Offer</button>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+{% endblock content %}

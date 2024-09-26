@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-wrap">
+    <section class="content-main">
+        {% if messages %}
+            <div class="container mt-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="container mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="content-title">Order Details</h2>
+                <!-- Add any additional buttons or links here -->
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-0">Order ID: {{ order.order_number }}</h5>
+                            <small class="text-muted">Placed on: {{ order.created_at }}</small>
+                        </div>
+
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            {% if order.status == 'Pending' or order.status == 'Return Pending' %}
+                                <span class="badge bg-warning text-dark" style="font-weight: bold; padding: 5px 10px; border-radius: 5px;">{{ order.status }}</span>
+                            {% elif order.status == 'Cancelled' or order.status == 'Return Cancelled' or order.status == 'Payment Pending' or order.status == 'Return Request' %}
+                                <span class="badge bg-danger text-light" style="font-weight: bold; padding: 5px 10px; border-radius: 5px;">{{ order.status }}</span>
+                            {% else %}
+                                <span class="badge bg-success text-light" style="font-weight: bold; padding: 5px 10px; border-radius: 5px;">{{ order.status }}</span>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row gy-4">
+                        <!-- Customer Information -->
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="material-icons md-person me-2"></i> Customer Information
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Name:</strong> {{ order.name }}</p>
+                                    <p class="mb-1"><strong>Email:</strong> {{ order.email }}</p>
+                                    <p class="mb-0"><strong>Phone:</strong> {{ order.user.phone_number }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Information -->
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-success text-white">
+                                    <i class="material-icons md-local_shipping me-2"></i> Order Information
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Shipping:</strong> Fargo Express</p>
+                                    <p class="mb-1"><strong>Payment Method:</strong>
+                                        {% if order.payment_method == "cash_on_delivery" %}
+                                            Cash on Delivery
+                                        {% elif order.payment_method == "wallet" %}
+                                            Wallet
+                                        {% else %}
+                                            {{ order.payment_method }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="mb-0"><strong>Status:</strong>
+                                        {% if order.status == 'Pending' or order.status == 'Return Pending' %}
+                                            Pending
+                                        {% elif order.status == 'Cancelled' or order.status == 'Return Cancelled' %}
+                                            Cancelled
+                                        {% else %}
+                                            {{ order.status }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-info text-white">
+                                    <i class="material-icons md-place me-2"></i> Delivery Address
+                                </div>
+                                <div class="card-body">
+                                    {% if order_address %}
+                                        <p class="mb-1">{{ order_address.address_line1 }}</p>
+                                        <p class="mb-1">{{ order_address.address_line2 }}</p>
+                                        <p class="mb-1">Pincode: {{ order_address.pincode }}</p>
+                                        <p class="mb-0">City: {{ order_address.city }}, {{ order_address.state }}</p>
+                                    {% else %}
+                                        <p class="mb-0">No address is marked as checked.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items Table -->
+                    <div class="table-responsive mt-5">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Size</th>
+                                    <th>Unit Price</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in aggregated_items %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <!-- <img src="{{ item.product__image1.url }}" alt="{{ item.product__product_name }}" class="img-fluid rounded me-3" width="60"> -->
+                                                <span>{{ item.product__product_name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ item.size }}</td>
+                                        <td>{{ item.unit_price }} ₹</td>
+                                        <td>{{ item.total_quantity }}</td>
+                                        <td class="text-end">{{ item.total_price }} ₹</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No items found</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-end">Total Price:</th>
+                                    <th class="text-end">{{ order.total_price }} ₹</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="text-end">Tax:</th>
+                                    <th class="text-end">{{ order.tax }} ₹</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="text-end">Shipping Fee:</th>
+                                    <th class="text-end">{{ order.shipping_fee }} ₹</th>
+                                </tr>
+                                {% if order.coupon_price %}
+                                <tr>
+                                    <th colspan="4" class="text-end">Coupon Discount:</th>
+                                    <th class="text-end">-{{ order.coupon_price }} ₹</th>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th colspan="4" class="text-end">Grand Total:</th>
+                                    <th class="text-end">{{ order.grand_total }} ₹</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mt-4">
+                        <div class="card">
+                            <div class="card-header bg-warning text-white">
+                                <i class="material-icons md-payment me-2"></i> Payment Method
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-0">
+                                    {% if order.payment_method == "cash_on_delivery" %}
+                                        Cash on Delivery
+                                    {% elif order.payment_method == "wallet" %}
+                                        Wallet
+                                    {% else %}
+                                        {{ order.payment_method }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Actions -->
+                    <!-- <div class="mt-4 text-end">
+                        <a href="#" class="btn btn-primary">Print Invoice</a>
+                        <a href="{% url 'download_pdf' order_id=order.id %}" class="btn btn-secondary">Download PDF</a>
+                        {% if order.status == "Payment Pending" %}
+                        <form method="post" action="{% url 'retry_page' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <button type="submit" class="btn btn-success" style="font-weight: bold;">Pay Now</button>
+                        </form>
+                        {% endif %} -->
+                        <div class="mt-4 text-end">
+                            <!-- Print Invoice Button -->
+                            <!-- Make sure the link is correct if you have a print functionality -->
+                            <a href="#" class="btn btn-primary">Print Invoice</a>
+                        
+                            <!-- Download PDF Button -->
+                            <a href="{% url 'download_pdf' order_id=order.id %}" class="btn btn-secondary">
+                                Download PDF
+                            </a>
+                        
+                            <!-- Pay Now Button (appears only if the order status is "Payment Pending") -->
+                            {% if order.status == "Payment Pending" %}
+                            <form method="post" action="{% url 'retry_page' %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <button type="submit" class="btn btn-success" style="font-weight: bold;">
+                                    Pay Now
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

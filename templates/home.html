@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- ========================= SECTION MAIN ========================= -->
+<section class="section-intro padding-y-sm">
+<div class="container">
+
+<div class="intro-banner-wrap">
+	<img src="{% static 'images/banners/ronaldo_cover.jpg' %}" class="img-fluid rounded">
+</div>
+
+</div> <!-- container //  -->
+</section>
+<!-- ========================= SECTION MAIN END// ========================= -->
+
+<!-- ========================= SECTION  ========================= -->
+<section class="section-name padding-y-sm">
+<div class="container">
+
+<header class="section-heading">
+	<a href="{% url 'store' %}" class="btn btn-outline-primary float-right">See all</a>
+	<h3 class="section-title">Popular products</h3>
+</header><!-- sect-heading -->
+
+	
+<div class="row">
+	{% for product in products %}
+	<div class="col-md-3">
+		<div class="card card-product-grid">
+			<a href="{{ product.get_url }}" class="img-wrap"> 
+                <img src="{{ product.images.url }}" alt="{{ product.product_name }}"> 
+            </a>
+			<a href="#" class="wishlist-icon position-absolute" style="top: 10px; right: 10px;" data-product-id="{{ product.id }}" onclick="toggleWishlist(event, this)">
+				<i class="fa fa-heart text-secondary{% if product.wishlisted %} text-danger{% endif %}"></i>
+			</a>
+			<figcaption class="info-wrap">
+				<a href="{{ product.get_url }}" class="title product-title">{{ product.product_name }}</a>
+				<div class="price mt-1">
+                    ₹ {{ product.price }}
+                    {% if product.discount_percentage > 0 %}
+                        <span style="font-size: 12px; padding-left: 3px;">
+                            <s>{{ product.old_price }}</s>
+                        </span>
+                        <span style="font-size: 12px; padding-left: 3px;">
+                            {{ product.discount_percentage }}%
+                        </span>
+                    {% endif %}
+                </div>
+                <!-- price-wrap.// -->
+
+				<div class="rating-star">
+					<span>
+						<i class="fa fa-star{% if product.averageReview < 0.5 %}-o{% elif product.averageReview >= 0.5 and product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview < 1.5 %}-o{% elif product.averageReview >= 1.5 and product.averageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview < 2.5 %}-o{% elif product.averageReview >= 2.5 and product.averageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview < 3.5 %}-o{% elif product.averageReview >= 3.5 and product.averageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview < 4.5 %}-o{% elif product.averageReview >= 4.5 and product.averageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+					</span>
+				</div>
+			</figcaption>
+		</div>
+	</div> <!-- col.// -->
+{% endfor %}
+
+</div> <!-- row.// -->
+
+</div><!-- container // -->
+</section>
+<!-- ========================= SECTION  END// ========================= -->
+
+
+
+
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- CSRF token retrieval script -->
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<!-- Wishlist Toggle Script -->
+<script>
+    function toggleWishlist(event, element) {
+        event.preventDefault(); // Prevent the page from scrolling to the top
+        const productId = element.getAttribute('data-product-id');
+        
+        axios.post(`/store/toggle-wishlist/${productId}/`, {}, {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            if (response.data.success) {
+                element.querySelector('i').classList.toggle('text-danger');
+            } else {
+                console.error(response.data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+<style>
+    .product-title {
+    display: block;               /* Ensures it behaves as a block element */
+    overflow: hidden;            /* Hides any overflowing text */
+    white-space: nowrap;         /* Prevents the text from wrapping to the next line */
+    text-overflow: ellipsis;     /* Adds the ellipsis */
+    max-width: 100%;             /* Adjusts the width to fit the parent container */
+}
+
+</style>
+</html>
+
+{% endblock %}

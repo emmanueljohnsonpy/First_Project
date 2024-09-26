@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="section-content padding-y bg">
+
+{% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+        {% include 'includes/dashboard_sidebar.html' %}
+        <main class="col-md-9">
+            <article class="card" style="width: 1000px;">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Your Order History</strong>
+            </header>
+            <div class="card-body">
+                <div class="row"> 
+                    <div class="col-md-12">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Payment method</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <th scope="row">{{ order.order_number }}</th>
+                                    <td>{{ order.created_at }}</td>
+                                    <td>₹{{ order.grand_total }}</td>
+                                    <td>
+                                        {% if order.payment_method == "cash_on_delivery" %}
+                                            Cash on Delivery
+                                        {% elif order.payment_method == "wallet" %}
+                                            Wallet
+                                        {% else %}
+                                            {{ order.payment_method }}
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td class="{% if order.status == 'Return Pending' or order.status == 'Pending' %}status-pending{% elif order.status == 'Return Cancelled' or order.status == 'Payment Pending' %}status-return-cancelled{% elif order.status == 'Return Success' %}status-return-success{% elif order.status == 'Cancelled' %}status-cancelled{% endif %}">
+                                        {% if order.status == 'Delivered' %}
+                                        <span class="text-success">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'Return Request' %}
+                                        <span class="text-danger">Return Request Sended</span>
+                                        {% elif order.status == 'Return Pending' or order.status == 'Pending' %}
+                                        {{ order.get_status_display }}
+                                        {% elif order.status == 'Return Cancelled' %}
+                                        {{ order.get_status_display }}
+                                        {% elif order.status == 'Return Success' %}
+                                        {{ order.get_status_display }}
+                                        {% elif order.status == 'Cancelled' %}
+                                        {{ order.get_status_display }}
+                                        {% else %}
+                                        {{ order.get_status_display }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center vertical-center">
+                                        {% if order.status == 'Pending' or order.status == 'Confirmed' or order.status == 'Processing' %}
+                                        <form method="post" action="{% url 'my_orders' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                                            <button type="submit" class="btn btn-danger" style="font-weight: bold;">Cancel</button>
+                                        </form>
+                                        {% elif order.status == 'Delivered' %}
+                                        <form method="post" action="{% url 'my_orders' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                                            <button type="submit" class="btn btn-danger" style="font-weight: bold;">Return</button>
+                                        </form>
+                                        {% elif order.status == 'Payment Pending' %}
+                                        <form method="post" action="{% url 'retry_page' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                                            <button type="submit" class="btn btn-success" style="font-weight: bold;">Pay Now</button>
+                                        </form>
+                                        {% elif order.status == 'Cancelled' %}
+                                        <button type="button" class="btn btn-secondary" disabled style="font-weight: bold;">Cancelled</button>
+                                        {% endif %}
+                                        <td>
+                                            <form action="{% url 'order_detail_view_user' order.id %}" method="get">
+                                                <button type="submit" class="btn btn-primary" style="font-weight: bold;">Details</button>
+                                            </form>
+                                        </td>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5">No orders found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+
+</section>
+<style>
+.text-success {
+    color: green; /* Change this to your desired shade of green */
+}
+
+.text-center.vertical-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.table {
+    width: 100%;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+.text-success {
+    color: green; /* Change this to your desired shade of green */
+}
+.status-pending {
+    color: rgb(255, 132, 0);
+}
+.status-return-cancelled {
+    color: red;
+}
+.status-return-success {
+    color: rgb(0, 255, 60);
+}
+.status-cancelled {
+    color: red;
+}
+</style>
+{% endblock %}

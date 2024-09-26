@@ -1,0 +1,602 @@
+{% extends 'admins/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<main class="main-wrap">
+    <header class="main-header navbar">
+        <div class="col-search">
+            <form class="searchform">
+                <div class="input-group">
+                    <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                    <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                </div>
+                <datalist id="search_terms">
+                    <option value="Products">
+                    </option><option value="New orders">
+                    </option><option value="Apple iphone">
+                    </option><option value="Ahmed Hassan">
+                </option></datalist>
+            </form>
+        </div>
+        <div class="col-nav">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link btn-icon" href="#">
+                        <i class="material-icons md-notifications animation-shake"></i>
+                        <span class="badge rounded-pill">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                        <a class="dropdown-item text-brand" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-us.png' %}" alt="English">English</a>
+                        <a class="dropdown-item" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-fr.png' %}" alt="Français">Français</a>
+                        <a class="dropdown-item" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-jp.png' %}" alt="日本語">日本語</a>
+                        <a class="dropdown-item" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-cn.png' %}" alt="中文">中文</a>
+                    </div>
+                </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="{% static 'admin/assets/imgs/people/avatar2.jpg' %}" alt="User"></a>                    
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Product</h2>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Edit Product Details</h4>
+                    </div>
+                    <!-- Include hidden field for product ID if editing an existing product -->
+                    <div class="card-body">
+                        <!-- <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                        
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Product Name:-</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}">
+                            </div>
+                        
+                            <div class="mb-4">
+                                <label class="form-label">Description:-</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" name="description">{{ product.description }}</textarea>
+                            </div>
+                        
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Price:-</label>
+                                        <input placeholder="$" type="text" class="form-control" name="price" value="{{ product.price }}">
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="mb-4">
+                                <label class="form-label">Category:-</label>
+                                <select class="form-select" name="category">
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        
+                            <br>
+                            <label class="form-label" for="images">Images:-</label>
+                            
+                            <div id="imageContainer0">
+                                <div class="input-upload" id="inputContainer0">
+                                    <div class="image-preview mt-3" id="imagePreviewContainer0">
+                                        
+                                        {% if product.images %}
+                                            <img src="{{ product.images.url }}" alt="Product Image" class="img-thumbnail">
+                                        {% endif %}
+                                    </div>
+                                    <input class="form-control mb-2" type="file" name="images" accept=".jpg, .jpeg, .png, .heic" id="imageInput0" onchange="handleFileChange(event, '0')">
+                                    <div class="crop-container" id="cropContainer0" style="display: none;">
+                                        <img id="cropImage0" class="img-m img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-primary mt-2" onclick="cropImage('0')">Crop</button>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div id="imageContainer1">
+                                <div class="input-upload" id="inputContainer1">
+                                    <div class="image-preview mt-3" id="imagePreviewContainer1">
+                                        {% if product.image1 %}
+                                            <img src="{{ product.image1.url }}" alt="Product Image" class="img-thumbnail">
+                                        {% endif %}
+                                    </div>
+                                    <input class="form-control mb-2" type="file" name="image1" accept=".jpg, .jpeg, .png, .heic" id="imageInput1" onchange="handleFileChange(event, '1')">
+                                    <div class="crop-container" id="cropContainer1" style="display: none;">
+                                        <img id="cropImage1" class="img-m img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-primary mt-2" onclick="cropImage('1')">Crop</button>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div id="imageContainer2">
+                                <div class="input-upload" id="inputContainer2">
+                                    <div class="image-preview mt-3" id="imagePreviewContainer2">
+                                        {% if product.image2 %}
+                                            <img src="{{ product.image2.url }}" alt="Product Image" class="img-thumbnail">
+                                        {% endif %}
+                                    </div>
+                                    <input class="form-control mb-2" type="file" name="image2" accept=".jpg, .jpeg, .png, .heic" id="imageInput2" onchange="handleFileChange(event, '2')">
+                                    <div class="crop-container" id="cropContainer2" style="display: none;">
+                                        <img id="cropImage2" class="img-m img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-primary mt-2" onclick="cropImage('2')">Crop</button>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                           
+                            <h2>Sizes</h2>
+                            <style>
+                                .image-preview {
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 100%;
+                                    height: 200px; /* Adjust based on your design */
+                                    border: 1px solid #ddd;
+                                    background: #f9f9f9;
+                                    overflow: hidden;
+                                }
+                                
+                                .crop-container {
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 100%;
+                                }
+                                
+                                #cropImage0, #cropImage1, #cropImage3 {
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                }
+                            </style>
+                        
+                            <div class="mb-4">
+                                <label class="form-label">Count of Size 3:-</label>
+                                <input type="number" class="form-control" name="stock_small" value="{{ product.stock_small }}">
+                            </div>
+                        
+                            <div class="mb-4">
+                                <label class="form-label">Count of Size 4:-</label>
+                                <input type="number" class="form-control" name="stock_medium" value="{{ product.stock_medium }}">
+                            </div>
+                        
+                            <div class="mb-4">
+                                <label class="form-label">Count of Size 5:-</label>
+                                <input type="number" class="form-control" name="stock_large" value="{{ product.stock_large }}">
+                            </div>
+                        
+                            <button type="submit" class="btn btn-primary">Edit Product</button>
+                        </form> -->
+                        <style>
+                            .error-message {
+                                color: red;
+                                font-size: 0.9em;
+                                margin-top: 5px;
+                            }
+                            .input-error {
+                                border: 1px solid red;
+                            }
+                            .image-preview {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 100%;
+                                height: 200px;
+                                border: 1px solid #ddd;
+                                background: #f9f9f9;
+                                overflow: hidden;
+                            }
+                            .crop-container {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 100%;
+                            }
+                            #cropImage0, #cropImage1, #cropImage2 {
+                                max-width: 100%;
+                                max-height: 100%;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <form method="post" enctype="multipart/form-data" id="editProductForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                    
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Product Name:</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}">
+                                <div id="product_name_error" class="error-message"></div>
+                            </div>
+                    
+                            <div class="mb-4">
+                                <label class="form-label">Description:</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" name="description" id="description">{{ product.description }}</textarea>
+                                <div id="description_error" class="error-message"></div>
+                            </div>
+                    
+                            <!-- <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Price:</label>
+                                        <input placeholder="$" type="text" class="form-control" name="price" id="price" value="{{ product.price }}">
+                                        <div id="price_error" class="error-message"></div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="old_price">Old Price:</label>
+                                        <input type="number" placeholder="₹" class="form-control" name="old_price" id="old_price" value="{{ product.old_price }}">
+                                        <div id="old_price_error" class="error-message"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="discount_percentage">Discount Percentage:</label>
+                                        <input type="number" placeholder="%" class="form-control" name="discount_percentage" id="discount_percentage" value="{{ product.discount_percentage }}">
+                                        <div id="discount_percentage_error" class="error-message"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Category:</label>
+                                <select class="form-select" name="category" id="category">
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div id="category_error" class="error-message"></div>
+                            </div>
+                    
+                            <br>
+                            
+                            <label class="form-label" for="images">Images:</label>
+                            <div id="imageContainer0">
+                                <div class="input-upload" id="inputContainer0">
+                                    <div class="image-preview mt-3" id="imagePreviewContainer0">
+                                        {% if product.images %}
+                                            <img src="{{ product.images.url }}" alt="Product Image" class="img-thumbnail">
+                                        {% endif %}
+                                    </div>
+                                    <input class="form-control mb-2" type="file" name="images" accept=".jpg, .jpeg, .png, .heic" id="imageInput0" onchange="handleFileChange(event, '0')">
+                                    <div class="crop-container" id="cropContainer0" style="display: none;">
+                                        <img id="cropImage0" class="img-m img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-primary mt-2" onclick="cropImage('0')">Crop</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Repeat for other images -->
+                            <div id="imageContainer1">
+                                <div class="input-upload" id="inputContainer1">
+                                    <div class="image-preview mt-3" id="imagePreviewContainer1">
+                                        {% if product.image1 %}
+                                            <img src="{{ product.image1.url }}" alt="Product Image" class="img-thumbnail">
+                                        {% endif %}
+                                    </div>
+                                    <input class="form-control mb-2" type="file" name="image1" accept=".jpg, .jpeg, .png, .heic" id="imageInput1" onchange="handleFileChange(event, '1')">
+                                    <div class="crop-container" id="cropContainer1" style="display: none;">
+                                        <img id="cropImage1" class="img-m img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-primary mt-2" onclick="cropImage('1')">Crop</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="imageContainer2">
+                                <div class="input-upload" id="inputContainer2">
+                                    <div class="image-preview mt-3" id="imagePreviewContainer2">
+                                        {% if product.image2 %}
+                                            <img src="{{ product.image2.url }}" alt="Product Image" class="img-thumbnail">
+                                        {% endif %}
+                                    </div>
+                                    <input class="form-control mb-2" type="file" name="image2" accept=".jpg, .jpeg, .png, .heic" id="imageInput2" onchange="handleFileChange(event, '2')">
+                                    <div class="crop-container" id="cropContainer2" style="display: none;">
+                                        <img id="cropImage2" class="img-m img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-primary mt-2" onclick="cropImage('2')">Crop</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h2>Sizes</h2>
+                            <div class="mb-4">
+                                <label class="form-label">Count of Size 3:</label>
+                                <input type="number" class="form-control" name="stock_small" id="stock_small" value="{{ product.stock_small }}">
+                                <div id="stock_small_error" class="error-message"></div>
+                            </div>
+                    
+                            <div class="mb-4">
+                                <label class="form-label">Count of Size 4:</label>
+                                <input type="number" class="form-control" name="stock_medium" id="stock_medium" value="{{ product.stock_medium }}">
+                                <div id="stock_medium_error" class="error-message"></div>
+                            </div>
+                    
+                            <div class="mb-4">
+                                <label class="form-label">Count of Size 5:</label>
+                                <input type="number" class="form-control" name="stock_large" id="stock_large" value="{{ product.stock_large }}">
+                                <div id="stock_large_error" class="error-message"></div>
+                            </div>
+                    
+                            <button type="submit" class="btn btn-primary">Edit Product</button>
+                        </form>
+                    
+                        <!-- <script>
+                            document.getElementById('editProductForm').addEventListener('submit', function(event) {
+                                let isValid = true;
+                                
+                                // Product Name validation
+                                const productName = document.getElementById('product_name');
+                                if (productName.value.trim() === '') {
+                                    showError('product_name', 'Product name is required');
+                                    isValid = false;
+                                }  else if (productName.value.trim().length < 3) {
+                                    showError('product_name', 'Product name must be at least 3 characters long');
+                                    isValid = false;
+                                } else {
+                                    clearError('product_name');
+                                }
+                    
+                                // Description validation
+                                const description = document.getElementById('description');
+                                if (description.value.trim() === '') {
+                                    showError('description', 'Description is required');
+                                    isValid = false;
+                                }  else if (description.value.trim().length < 3) {
+                                    showError('description', 'Description must be at least 3 characters long');
+                                    isValid = false;
+                                } else {
+                                    clearError('description');
+                                }
+                    
+                                // Price validation
+                                const price = document.getElementById('price');
+                                if (price.value.trim() === '' || isNaN(price.value) || parseFloat(price.value) <= 0) {
+                                    showError('price', 'Please enter a valid price');
+                                    isValid = false;
+                                } else {
+                                    clearError('price');
+                                }
+                    
+                                // Category validation
+                                const category = document.getElementById('category');
+                                if (category.value === '') {
+                                    showError('category', 'Please select a category');
+                                    isValid = false;
+                                } else {
+                                    clearError('category');
+                                }
+                    
+                                // Stock validation
+                                const stockFields = ['stock_small', 'stock_medium', 'stock_large'];
+                                stockFields.forEach(field => {
+                                    const stockInput = document.getElementById(field);
+                                    if (stockInput.value.trim() === '' || isNaN(stockInput.value) || parseInt(stockInput.value) < 0) {
+                                        showError(field, 'Please enter a valid stock count (0 or positive integer)');
+                                        isValid = false;
+                                    } else {
+                                        clearError(field);
+                                    }
+                                });
+                    
+                                if (!isValid) {
+                                    event.preventDefault();
+                                }
+                            });
+                    
+                            function showError(fieldId, message) {
+                                const inputElement = document.getElementById(fieldId);
+                                const errorElement = document.getElementById(`${fieldId}_error`);
+                                inputElement.classList.add('input-error');
+                                errorElement.textContent = message;
+                            }
+                            
+                            function clearError(fieldId) {
+                                const inputElement = document.getElementById(fieldId);
+                                const errorElement = document.getElementById(`${fieldId}_error`);
+                                inputElement.classList.remove('input-error');
+                                errorElement.textContent = '';
+                            }
+                            
+                        </script> -->
+                        <script>
+                            document.getElementById('editProductForm').addEventListener('submit', function(event) {
+                                let isValid = true;
+                                
+                                // Product Name validation
+                                const productName = document.getElementById('product_name');
+                                if (productName.value.trim() === '') {
+                                    showError('product_name', 'Product name is required');
+                                    isValid = false;
+                                } else if (productName.value.trim().length < 3) {
+                                    showError('product_name', 'Product name must be at least 3 characters long');
+                                    isValid = false;
+                                } else {
+                                    clearError('product_name');
+                                }
+                        
+                                // Description validation
+                                const description = document.getElementById('description');
+                                if (description.value.trim() === '') {
+                                    showError('description', 'Description is required');
+                                    isValid = false;
+                                } else if (description.value.trim().length < 3) {
+                                    showError('description', 'Description must be at least 3 characters long');
+                                    isValid = false;
+                                } else {
+                                    clearError('description');
+                                }
+                                
+                                // Price validation
+                                // const price = document.getElementById('price');
+                                // if (price.value.trim() === '' || isNaN(price.value) || parseFloat(price.value) <= 0) {
+                                //     showError('price', 'Please enter a valid price');
+                                //     isValid = false;
+                                // } else {
+                                //     clearError('price');
+                                // }
+                                const oldPrice = document.getElementById('old_price');
+                                if (oldPrice.value.trim() === '' || isNaN(oldPrice.value) || parseFloat(oldPrice.value) < 0) {
+                                    showError('old_price', 'Please enter a valid old price greater than or equal to 0');
+                                    isValid = false;
+                                } else {
+                                    clearError('old_price');
+                                }
+
+                                // Discount Percentage validation
+                                const discountPercentage = document.getElementById('discount_percentage');
+                                if (discountPercentage.value.trim() === '' || isNaN(discountPercentage.value) || parseFloat(discountPercentage.value) < 0 || parseFloat(discountPercentage.value) > 100) {
+                                    showError('discount_percentage', 'Please enter a valid discount percentage between 0 and 100');
+                                    isValid = false;
+                                } else {
+                                    clearError('discount_percentage');
+                                }
+                        
+                                // Category validation
+                                const category = document.getElementById('category');
+                                if (category.value === '') {
+                                    showError('category', 'Please select a category');
+                                    isValid = false;
+                                } else {
+                                    clearError('category');
+                                }
+                        
+                                // Stock validation
+                                const stockFields = ['stock_small', 'stock_medium', 'stock_large'];
+                                stockFields.forEach(field => {
+                                    const stockInput = document.getElementById(field);
+                                    if (stockInput.value.trim() === '' || isNaN(stockInput.value) || parseInt(stockInput.value) < 0) {
+                                        showError(field, 'Please enter a valid stock count (0 or positive integer)');
+                                        isValid = false;
+                                    } else {
+                                        clearError(field);
+                                    }
+                                });
+                        
+                                // Image validation
+                                const imageInputs = ['imageInput0', 'imageInput1', 'imageInput2'];
+                                imageInputs.forEach(inputId => {
+                                    const fileInput = document.getElementById(inputId);
+                                    if (fileInput.files.length > 0) {
+                                        const file = fileInput.files[0];
+                                        const validFormats = ['image/jpeg', 'image/png', 'image/heic'];
+                                        if (!validFormats.includes(file.type)) {
+                                            showError(inputId, 'Please upload a valid image (jpg, jpeg, png, heic)');
+                                            isValid = false;
+                                        } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                                            showError(inputId, 'Image size should be less than 5MB');
+                                            isValid = false;
+                                        } else {
+                                            clearError(inputId);
+                                        }
+                                    }
+                                });
+                        
+                                if (!isValid) {
+                                    event.preventDefault();
+                                }
+                            });
+                        
+                            function showError(fieldId, message) {
+                                const inputElement = document.getElementById(fieldId);
+                                const errorElement = document.getElementById(`${fieldId}_error`);
+                                inputElement.classList.add('input-error');
+                                errorElement.textContent = message;
+                            }
+                            
+                            function clearError(fieldId) {
+                                const inputElement = document.getElementById(fieldId);
+                                const errorElement = document.getElementById(`${fieldId}_error`);
+                                inputElement.classList.remove('input-error');
+                                errorElement.textContent = '';
+                            }
+                        </script>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+function handleFileChange(event, index) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const image = document.getElementById(`cropImage${index}`);
+            image.src = e.target.result;
+            const cropContainer = document.getElementById(`cropContainer${index}`);
+            cropContainer.style.display = 'block';
+
+            // Initialize cropper
+            if (image.cropper) {
+                image.cropper.destroy();
+            }
+            image.cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function cropImage(index) {
+    const image = document.getElementById(`cropImage${index}`);
+    if (image.cropper) {
+        const canvas = image.cropper.getCroppedCanvas();
+        const croppedImageURL = canvas.toDataURL();
+        // Display cropped image or do something with it
+        const previewContainer = document.getElementById(`imagePreviewContainer${index}`);
+        previewContainer.innerHTML = `<img src="${croppedImageURL}" class="img-thumbnail">`;
+        // Hide the crop container
+        const cropContainer = document.getElementById(`cropContainer${index}`);
+        cropContainer.style.display = 'none';
+    }
+}
+
+</script>
+<style>
+    .input-upload img {
+    max-width: 206px;
+    margin-bottom: 0px;
+}
+</style>
+{% endblock %}

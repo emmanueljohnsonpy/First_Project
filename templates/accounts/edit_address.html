@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    {% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+            <main class="col-md-9">
+                <div class="row">
+                    <aside class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Edit Address</h4>
+                                <form action="{% url 'edit_address' address.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="full_name">Full name *</label>
+                                        <input type="text" id="full_name" name="full_name" class="form-control" value="{{ address.full_name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address">Address *</label>
+                                        <input type="text" id="address" name="address" class="form-control" value="{{ address.address }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address_line2">Address line2</label>
+                                        <input type="text" id="address_line2" name="address_line2" class="form-control" value="{{ address.address_line2 }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City / Town *</label>
+                                        <input type="text" id="city" name="city" class="form-control" value="{{ address.city }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State *</label>
+                                        <input type="text" id="state" name="state" class="form-control" value="{{ address.state }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pincode">Pincode / ZIP *</label>
+                                        <input type="text" id="pincode" name="pincode" class="form-control" value="{{ address.pincode }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone *</label>
+                                        <input type="text" id="phone" name="phone" class="form-control" value="{{ address.phone }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email address *</label>
+                                        <input type="email" id="email" name="email" class="form-control" value="{{ address.email }}" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Address</button>
+                                </form>
+                            </div>
+                        </div>
+                    </aside>
+                    
+                    <aside class="col-lg-6">
+                      <div class="card">
+                          <div class="card-body">
+                              <h4 class="card-title mb-4">Address Preview</h4>
+                              <p id="address-preview">
+                                  <strong><span id="preview-full_name">{{ address.full_name }}</span></strong><br>
+                                  <strong><span id="preview-address">{{ address.address }}</span></strong><br>
+                                  <strong><span id="preview-address_line2">{{ address.address_line2 }}</span></strong><br>
+                                  <strong><span id="preview-city">{{ address.city }}</span></strong><br>
+                                  <strong><span id="preview-state">{{ address.state }}</span></strong><br>
+                                  <strong><span id="preview-pincode">{{ address.pincode }}</span></strong><br>
+                                  <strong><span id="preview-phone">{{ address.phone }}</span></strong><br>
+                                  <strong><span id="preview-email">{{ address.email }}</span></strong><br>
+                              </p>
+                  
+                              <!-- Buttons for Edit and Delete -->
+                              <div class="mt-4">
+                                <a href="{% url 'edit_address' address.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                                
+                              </div>
+                          </div>
+                      </div>
+                  </aside>
+                  
+                </div> <!-- row inside main.// -->
+            </main>
+        </div> <!-- main row.// -->
+    </div> <!-- container.// -->
+</section>
+{% endblock %}
+
+<script>
+function updateAddressPreview() {
+    document.getElementById('preview-full_name').textContent = document.getElementById('full_name').value;
+    document.getElementById('preview-address').textContent = document.getElementById('address').value;
+    document.getElementById('preview-address_line2').textContent = document.getElementById('address_line2').value;
+    document.getElementById('preview-city').textContent = document.getElementById('city').value;
+    document.getElementById('preview-state').textContent = document.getElementById('state').value;
+    document.getElementById('preview-pincode').textContent = document.getElementById('pincode').value;
+    document.getElementById('preview-phone').textContent = document.getElementById('phone').value;
+    document.getElementById('preview-email').textContent = document.getElementById('email').value;
+}
+</script>
