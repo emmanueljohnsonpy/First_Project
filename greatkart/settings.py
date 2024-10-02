@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 SECRET_KEY='=y6g2hiq^(7idfoaea$kbf)o$z^=m4bzvaa#s36kdrd0^!q92='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG=True
+DEBUG=False
 
 ALLOWED_HOSTS = ['65.2.114.165', 'localhost', 'kaalpanthu.shop']
 
