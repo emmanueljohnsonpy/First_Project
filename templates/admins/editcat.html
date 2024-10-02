@@ -2,6 +2,24 @@
 {% load static %}
 {% block content %}
 <main class="main-wrap">
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+                var backgroundColor = "{{ message.extra_tags }}" === "error" ? "#f44336" : "#4CAF50";
+                Toastify({
+                    text: "{{ message }}",
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: backgroundColor,
+                    stopOnFocus: true
+                }).showToast();
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
     <header class="main-header navbar">
         <div class="col-search">
             <form class="searchform">
@@ -68,21 +86,25 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <form method="POST" enctype="multipart/form-data">
+                        <form method="POST" enctype="multipart/form-data" id="editCategoryForm">
                             {% csrf_token %}
                             <div class="mb-4">
-                                <label for="product_name" class="form-label">Name</label>
-                                <input type="text" value="{{ category.category_name }}" placeholder="Type here" class="form-control" id="product_name" name="name">
+                                <label for="category_name" class="form-label">Name</label>
+                                <input type="text" value="{{ category.category_name }}" placeholder="Type here" class="form-control" id="category_name" name="name">
+                                <small id="nameError" class="text-danger"></small>
                             </div>
-                            
+                        
                             <div class="mb-4">
                                 <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" class="form-control" name="description">{{ category.description }}</textarea>
+                                <textarea placeholder="Type here" class="form-control" id="description" name="description">{{ category.description }}</textarea>
+                                <small id="descriptionError" class="text-danger"></small>
                             </div>
+                        
                             <div class="d-grid">
-                                <button class="btn btn-primary" name="status">Edit Category</button>
+                                <button class="btn btn-primary" name="status" type="submit" onclick="return validateForm()">Edit Category</button>
                             </div>
                         </form>
+                        
                     </div>
                     <div class="col-md-9">
                         
@@ -106,4 +128,45 @@
         </div>
     </footer>
 </main>
+<script>
+    function validateForm() {
+    // Get form fields
+    let categoryName = document.getElementById("category_name");
+    let description = document.getElementById("description");
+
+    // Get error message elements
+    let nameError = document.getElementById("nameError");
+    let descriptionError = document.getElementById("descriptionError");
+
+    // Reset styles and error messages
+    categoryName.style.borderColor = "";
+    description.style.borderColor = "";
+    nameError.textContent = "";
+    descriptionError.textContent = "";
+
+    // Initialize validation flag
+    let isValid = true;
+
+    // Regex pattern to allow only letters, numbers, and spaces
+    let validPattern = /^[a-zA-Z0-9 ]+$/;
+
+    // Validate category name (no special characters)
+    if (categoryName.value.length < 3 || categoryName.value.length > 15 || !validPattern.test(categoryName.value)) {
+        categoryName.style.borderColor = "red";
+        nameError.textContent = "Name must be between 3 and 15 characters and contain only letters, numbers, and spaces.";
+        isValid = false;
+    }
+
+    // Validate description (no special characters)
+    if (description.value.length < 10 || description.value.length > 50 || !validPattern.test(description.value)) {
+        description.style.borderColor = "red";
+        descriptionError.textContent = "Description must be between 10 and 50 characters and contain only letters, numbers, and spaces.";
+        isValid = false;
+    }
+
+    // Return validation status
+    return isValid;
+}
+
+</script>
 {% endblock content %}

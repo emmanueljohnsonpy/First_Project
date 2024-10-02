@@ -189,8 +189,9 @@ def login(request):
             if not user.is_blocked:
                 messages.warning(request, 'Your account is blocked. Please contact support.')
                 return redirect('login')
-        except User.DoesNotExist:
-            pass  # If the user doesn't exist, proceed with the standard authentication flow
+        except Account.DoesNotExist:
+            messages.error(request, 'Email does not exist. Please register first.')
+            return redirect('login')
 
         user = authenticate(request, email=email, password=password)
         if user is not None:
@@ -516,7 +517,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from orders.models import Order, Wallet, WalletTransaction
-
 @login_required(login_url='login')
 @user_login_required
 def my_orders(request):
@@ -560,26 +560,16 @@ def my_orders(request):
                 
                 messages.success(request, 'Your order has been cancelled and the amount has been added to your wallet.')
             elif order.status == 'Delivered':
-                # order.status = 'Return Pending'
+                # Set status to 'Return Request' and do not credit wallet yet
                 order.status = 'Return Request'
                 order.save()
-                # Update or create wallet
-                wallet, created = Wallet.objects.get_or_create(user=request.user)
-                wallet.update_balance('credit', Decimal(str(order.grand_total)))
                 
-                # Create a new wallet transaction record
-                WalletTransaction.objects.create(
-                    wallet=wallet,
-                    amount=Decimal(str(order.grand_total)),
-                    transaction_type='credit',
-                    description=f'Refund for returned order #{order.id}'
-                )
-                messages.success(request, 'Your return request has been submitted, and money has been added to your balance.')
+                messages.success(request, 'Your return request has been submitted. We will review your request and credit the amount to your wallet once the verification process is complete.')
             elif order.status == 'Return Pending':
                 order.status = 'Delivered'
                 order.save()
-                messages.success(request, 'Your return request has been submitted, and money has been added to your balance.')
-            
+                messages.success(request, 'Your return request has been submitted. We will review your request and credit the amount to your wallet once the verification process is complete.')
+
             return redirect('my_orders')  # Redirect to avoid resubmission on refresh
     
     return render(request, 'accounts/my_orders.html', {'orders': orders})

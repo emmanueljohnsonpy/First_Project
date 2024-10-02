@@ -10,6 +10,32 @@
 
 <main class="main-wrap">
     <header class="main-header navbar">
+        <div class="col-search">
+            <form class="searchform">
+                <div class="input-group">
+                    <input type="text" name="search" placeholder="Search Products" class="form-control bg-white">
+                </div>
+                <datalist id="search_terms">
+                    <option value="Products">
+                    </option><option value="New orders">
+                    </option><option value="Apple iphone">
+                    </option><option value="Ahmed Hassan">
+                </option></datalist>
+            </form>
+        </div>
+        <div class="col-nav">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+              
+                <li class="nav-item">
+                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                </li>
+                
+            </ul>
+        </div>
     </header>
     <section class="content-main">
         {% if messages %}
@@ -28,13 +54,7 @@
             </div>
         </div>
         <div class="card mb-4">
-            <header class="card-header">
-                <div class="row gx-3">
-                    <div class="col-lg-4 col-md-6 me-auto">
-                        <input type="text" placeholder="Search..." class="form-control">
-                    </div>
-                </div>
-            </header> <!-- card-header end// -->
+         
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover">

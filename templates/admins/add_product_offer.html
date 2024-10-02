@@ -2,6 +2,24 @@
 {% load static %}
 {% block content %}
 <main class="main-wrap">
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+                var backgroundColor = "{{ message.extra_tags }}" === "error" ? "#f44336" : "#4CAF50";
+                Toastify({
+                    text: "{{ message }}",
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: backgroundColor,
+                    stopOnFocus: true
+                }).showToast();
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
     <header class="main-header navbar">
         
         <div class="col-nav">
@@ -60,25 +78,41 @@
                                 document.getElementById('description_error').innerText = '';
                                 document.getElementById('offer_percentage_error').innerText = '';
                         
-                                // Validate Offer Name
+                                // Regex pattern to allow only letters, numbers, and spaces
+                                const validPattern = /^[a-zA-Z0-9 ]+$/;
+                        
+                                // Validate Offer Name (between 3-50 characters, numbers, letters, and spaces only)
                                 const offerName = document.getElementById('offer_name').value.trim();
-                                if (offerName.length < 1) {
-                                    document.getElementById('offer_name_error').innerText = 'Offer Name is required.';
+                                if (offerName.length < 3) {
+                                    document.getElementById('offer_name_error').innerText = 'Offer Name must be at least 3 characters long.';
+                                    isValid = false;
+                                } else if (offerName.length > 10) {
+                                    document.getElementById('offer_name_error').innerText = 'Offer Name cannot exceed 10 characters.';
+                                    isValid = false;
+                                } else if (!validPattern.test(offerName)) {
+                                    document.getElementById('offer_name_error').innerText = 'Offer Name can only contain letters, numbers, and spaces.';
                                     isValid = false;
                                 }
                         
-                                // Validate Description
+                                // Validate Description (between 10-200 characters, numbers, letters, and spaces only)
                                 const description = document.getElementById('description').value.trim();
                                 if (description.length < 10) {
                                     document.getElementById('description_error').innerText = 'Description must be at least 10 characters long.';
                                     isValid = false;
+                                } else if (description.length > 50) {
+                                    document.getElementById('description_error').innerText = 'Description cannot exceed 50 characters.';
+                                    isValid = false;
+                                } else if (!validPattern.test(description)) {
+                                    document.getElementById('description_error').innerText = 'Description can only contain letters, numbers, and spaces.';
+                                    isValid = false;
                                 }
                         
-                                // Validate Offer Percentage
+                                // Validate Offer Percentage (positive numbers, up to 2 decimal places, between 1-100%)
                                 const offerPercentage = document.getElementById('offer_percentage').value.trim();
                                 const percentageRegex = /^[0-9]{1,2}(\.[0-9]{1,2})?$/;
-                                if (!offerPercentage.match(percentageRegex) || parseFloat(offerPercentage) <= 0) {
-                                    document.getElementById('offer_percentage_error').innerText = 'Offer Percentage must be a positive number with up to two decimal places.';
+                                const percentageValue = parseFloat(offerPercentage);
+                                if (!percentageRegex.test(offerPercentage) || percentageValue <= 0 || percentageValue > 100) {
+                                    document.getElementById('offer_percentage_error').innerText = 'Offer Percentage must be between 1 and 100 with up to two decimal places.';
                                     isValid = false;
                                 }
                         
@@ -88,6 +122,8 @@
                                 }
                             });
                         </script>
+                        
+                        
                         
                         
                     </div>

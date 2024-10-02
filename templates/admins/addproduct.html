@@ -321,29 +321,44 @@
                             document.getElementById('productForm').addEventListener('submit', function(event) {
                                 let isValid = true;
                                 
-                                // Product Name validation
-                                const productName = document.getElementById('product_name');
-                                if (productName.value.trim() === '') {
-                                    showError('product_name', 'Product name is required');
-                                    isValid = false;
-                                } else if (productName.value.trim().length < 3) {
-                                    showError('product_name', 'Product name must be at least 3 characters long');
-                                    isValid = false;
-                                } else {
-                                    clearError('product_name');
-                                }
-                            
-                                // Description validation
-                                const description = document.getElementById('description');
-                                if (description.value.trim() === '') {
-                                    showError('description', 'Description is required');
-                                    isValid = false;
-                                } else if (description.value.trim().length < 3) {
-                                    showError('description', 'Description must be at least 3 characters long');
-                                    isValid = false;
-                                } else {
-                                    clearError('description');
-                                }
+                                // Regular expression to allow only letters, numbers, and spaces
+    const alphaNumericRegex = /^[a-zA-Z0-9 ]+$/;
+
+// Product Name validation
+const productName = document.getElementById('product_name');
+if (productName.value.trim() === '') {
+    showError('product_name', 'Product name is required');
+    isValid = false;
+} else if (productName.value.trim().length < 3) {
+    showError('product_name', 'Product name must be at least 3 characters long');
+    isValid = false;
+} else if (productName.value.trim().length > 100) {
+            showError('product_name', 'Product name cannot exceed 100 characters');
+            isValid = false;
+        } else if (!alphaNumericRegex.test(productName.value.trim())) {
+    showError('product_name', 'Product name can only contain letters, numbers, and spaces');
+    isValid = false;
+} else {
+    clearError('product_name');
+}
+
+// Description validation
+const description = document.getElementById('description');
+if (description.value.trim() === '') {
+    showError('description', 'Description is required');
+    isValid = false;
+} else if (description.value.trim().length < 10) {
+    showError('description', 'Description must be at least 10 characters long');
+    isValid = false;
+} else if (description.value.trim().length > 500) {
+            showError('description', 'Description cannot exceed 500 characters');
+            isValid = false;
+        }  else if (!alphaNumericRegex.test(description.value.trim())) {
+    showError('description', 'Description can only contain letters, numbers, and spaces');
+    isValid = false;
+} else {
+    clearError('description');
+}
                             
                                 // Price validation
                                 // const price = document.getElementById('price');

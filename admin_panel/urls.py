@@ -25,7 +25,9 @@ urlpatterns = [
     path('add-product-offer/', views.add_product_offer, name='add_product_offer'),
     path('add-cat-offer/', views.add_cat_offer, name='add_cat_offer'),
     path('offer/<int:id>/toggle/', views.toggle_offer_status, name='toggle_offer_status'),
+    path('edit_offer/<int:id>/', views.edit_offer, name='edit_offer'),
     path('edit-offer/<int:id>/', views.edit_product_offer, name='edit_product_offer'),
+    path('edit-cat/<int:id>/', views.edit_cat_offer, name='edit_cat_offer'),
     path('show-items/', views.show_items, name='show_items'),
     path('apply-offer/', views.apply_offer_to_product, name='apply_offer_to_product'),
     path('remove-offer-from-product/', views.remove_offer_from_product, name='remove_offer_from_product'),
@@ -33,7 +35,7 @@ urlpatterns = [
     path('remove-offer-from-category/', views.remove_offer_from_category, name='remove_offer_from_category'),
     path('download-sales-report/', views.generate_pdf, name='download_sales_report'),
     path('download-sales-report-excel/', views.download_sales_report_excel, name='download_sales_report_excel'),
-    path('order_detail_view/<int:order_id>/', views.order_detail_view, name='order_detail_view')
-     
+    path('order_detail_view/<int:order_id>/', views.order_detail_view, name='order_detail_view'),
+ 
 ]
 

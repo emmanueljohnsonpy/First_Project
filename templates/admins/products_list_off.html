@@ -88,7 +88,11 @@
             <span>{{product.price}}</span>
         </div>
         <div class="col-lg-1 col-sm-2 col-4 col-date">
-            <span>{{ product.discount_percentage }}%</span>
+            {% if product.applied_offer_name %}
+        <span>{{ product.applied_offer_name }} ({{ product.discount_percentage }}%)</span>
+    {% else %}
+        <span>{{ product.discount_percentage }}%</span>
+    {% endif %}
         </div>
         <div class="col-lg-2 col-sm-2 col-4 col-action text-center">
             <form method="POST" action="{% if product.product_disc_added == False %}{% url 'apply_offer_to_product' %}{% else %}{% url 'remove_offer_from_product' %}{% endif %}">

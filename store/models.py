@@ -30,6 +30,8 @@ class Product(models.Model):
     discount_percentage = models.PositiveIntegerField(default=0)
     product_disc_added = models.BooleanField(default=False, null=True)
     cat_disc_added = models.BooleanField(default=False, null=True)
+    applied_offer_name = models.CharField(max_length=20 ,null=True)
+    applied_offer_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
    
     
     def get_url(self):
@@ -118,7 +120,7 @@ class Offer(models.Model):
         ('unblock', 'Unblock'),
     ]
 
-    offer_name = models.CharField(max_length=255)
+    offer_name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     offer_type = models.CharField(max_length=50, choices=OFFER_TYPE_CHOICES)
     offer_percentage = models.DecimalField(max_digits=5, decimal_places=2)
@@ -129,5 +131,10 @@ class Offer(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.offer_name
+    def clean(self):
+        if Offer.objects.filter(offer_name=self.offer_name).exists():
+            raise ValidationError(f"Offer with the name '{self.offer_name}' already exists.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Call clean method to validate before saving
+        super().save(*args, **kwargs)

@@ -2,6 +2,24 @@
 {% load static %}
 {% block content %}
 <main class="main-wrap">
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+                var backgroundColor = "{{ message.extra_tags }}" === "error" ? "#f44336" : "#4CAF50";
+                Toastify({
+                    text: "{{ message }}",
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: backgroundColor,
+                    stopOnFocus: true
+                }).showToast();
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
     <header class="main-header navbar">
         
         <div class="col-nav">
@@ -57,7 +75,7 @@
                             </div>
                             <div class="mb-4">
                                 <label for="expiryDate" class="form-label">Expiry Date:</label>
-                                <input value="{{ coupon.expiry_date|date:'Y-m-d' }}" type="date" id="expiryDate" name="expiryDate" class="form-control" required>
+                                <input value="{{ coupon.expiry_date|date:'Y-m-d' }}" type="date" id="expiryDate" name="expiryDate" class="form-control" >
                                 <small class="text-danger" id="expiryDateError"></small>
                             </div>
                             <div class="d-grid">
@@ -67,33 +85,38 @@
                         
                         
                         <script>
-                          
-                            const COUPON_CODE_MIN_LENGTH = 8;  // Set your desired minimum length here
-                            const COUPON_CODE_MAX_LENGTH = 20; // Set your desired maximum length here
-                            const DESCRIPTION_MIN_LENGTH = 20; // Set your desired minimum length here
-                            const DESCRIPTION_MAX_LENGTH = 200; // Set your desired maximum length here
-
+                            const COUPON_CODE_MIN_LENGTH = 3;  // Minimum length for coupon code
+                            const COUPON_CODE_MAX_LENGTH = 10; // Maximum length for coupon code
+                            const DESCRIPTION_MIN_LENGTH = 10;   // Minimum length for description
+                            const DESCRIPTION_MAX_LENGTH = 50;  // Maximum length for description
+                        
                             document.getElementById('couponForm').addEventListener('submit', function(event) {
                                 let isValid = true;
-                                
+                        
                                 // Coupon Code validation
                                 const code = document.getElementById('code');
-                                if (code.value.length < COUPON_CODE_MIN_LENGTH || code.value.length > COUPON_CODE_MAX_LENGTH) {
-                                    document.getElementById('codeError').textContent = `Coupon code must be between ${COUPON_CODE_MIN_LENGTH} and ${COUPON_CODE_MAX_LENGTH} characters.`;
+                                const couponCodePattern = /^[A-Za-z0-9 ]+$/; // Only letters, numbers, and spaces
+                                if (!couponCodePattern.test(code.value) || 
+                                    code.value.length < COUPON_CODE_MIN_LENGTH || 
+                                    code.value.length > COUPON_CODE_MAX_LENGTH) {
+                                    document.getElementById('codeError').textContent = `Coupon code must be between ${COUPON_CODE_MIN_LENGTH} and ${COUPON_CODE_MAX_LENGTH} characters and can only contain letters, numbers, and spaces.`;
                                     isValid = false;
                                 } else {
                                     document.getElementById('codeError').textContent = '';
                                 }
-                                
+                        
                                 // Description validation
                                 const description = document.getElementById('description');
-                                if (description.value.length < DESCRIPTION_MIN_LENGTH || description.value.length > DESCRIPTION_MAX_LENGTH) {
-                                    document.getElementById('descriptionError').textContent = `Description must be between ${DESCRIPTION_MIN_LENGTH} and ${DESCRIPTION_MAX_LENGTH} characters.`;
+                                const descriptionPattern = /^[A-Za-z0-9 ]+$/; // Only letters, numbers, and spaces
+                                if (!descriptionPattern.test(description.value) || 
+                                    description.value.length < DESCRIPTION_MIN_LENGTH || 
+                                    description.value.length > DESCRIPTION_MAX_LENGTH) {
+                                    document.getElementById('descriptionError').textContent = `Description must be between ${DESCRIPTION_MIN_LENGTH} and ${DESCRIPTION_MAX_LENGTH} characters and can only contain letters, numbers, and spaces.`;
                                     isValid = false;
                                 } else {
                                     document.getElementById('descriptionError').textContent = '';
                                 }
-                                
+                        
                                 // Discount Percentage validation
                                 const discountPercentage = document.getElementById('discountPercentage');
                                 if (discountPercentage.value < 0 || discountPercentage.value > 99 || !/^\d+(\.\d{1,2})?$/.test(discountPercentage.value)) {
@@ -102,7 +125,7 @@
                                 } else {
                                     document.getElementById('discountError').textContent = '';
                                 }
-                                
+                        
                                 // Minimum Purchase Amount validation
                                 const minPurchaseAmount = document.getElementById('minPurchaseAmount');
                                 if (minPurchaseAmount.value < 0 || !/^\d+(\.\d{1,2})?$/.test(minPurchaseAmount.value)) {
@@ -111,7 +134,7 @@
                                 } else {
                                     document.getElementById('minPurchaseError').textContent = '';
                                 }
-
+                        
                                 // Max Redeemable Value validation
                                 const maxRedeemableValue = document.getElementById('maxRedeemableValue');
                                 if (maxRedeemableValue.value < 0 || !/^\d+(\.\d{1,2})?$/.test(maxRedeemableValue.value)) {
@@ -120,8 +143,8 @@
                                 } else {
                                     document.getElementById('maxRedeemableError').textContent = '';
                                 }
-                                
-                                // Quantity validation (Fixed)
+                        
+                                // Quantity validation
                                 const quantity = document.getElementById('quantity');
                                 if (quantity.value === '' || quantity.value < 0 || !Number.isInteger(Number(quantity.value))) {
                                     document.getElementById('quantityError').textContent = 'Quantity must be a non-negative integer.';
@@ -129,23 +152,28 @@
                                 } else {
                                     document.getElementById('quantityError').textContent = '';
                                 }
-                                                
-                                // Expiry Date validation (Fixed)
+                        
+                                // Expiry Date validation
                                 const expiryDate = document.getElementById('expiryDate');
                                 const currentDate = new Date();
-                                currentDate.setHours(0, 0, 0, 0);  // Set time to midnight for date comparison
-                                if (expiryDate.value === '' || new Date(expiryDate.value) < currentDate) {
-                                    document.getElementById('expiryDateError').textContent = 'Expiry date must be today or in the future.';
+                                currentDate.setHours(0, 0, 0, 0); // Set time to midnight for date comparison
+                                const selectedDate = new Date(expiryDate.value);
+                        
+                                // Ensure the selected date is a future date (after today)
+                                if (expiryDate.value === '' || selectedDate <= currentDate) {
+                                    document.getElementById('expiryDateError').textContent = 'Expiry date must be a future date.';
                                     isValid = false;
                                 } else {
                                     document.getElementById('expiryDateError').textContent = '';
                                 }
-                                
+                        
                                 if (!isValid) {
                                     event.preventDefault();
                                 }
                             });
                         </script>
+                        
+                        
                         
                         
                     </div>

@@ -89,85 +89,96 @@
                         </form>
                         
                         <script>
-                         
-                    const COUPON_CODE_MIN_LENGTH = 8;  // Set your desired minimum length here
-                    const COUPON_CODE_MAX_LENGTH = 20; // Set your desired maximum length here
-                    const DESCRIPTION_MIN_LENGTH = 20; // Set your desired minimum length here
-                    const DESCRIPTION_MAX_LENGTH = 200; // Set your desired maximum length here
-
-                    document.getElementById('couponForm').addEventListener('submit', function(event) {
-                        let isValid = true;
+                            const COUPON_CODE_MIN_LENGTH = 3;  // Set your desired minimum length here
+                            const COUPON_CODE_MAX_LENGTH = 10; // Set your desired maximum length here
+                            const DESCRIPTION_MIN_LENGTH = 10;   // Set your desired minimum length here
+                            const DESCRIPTION_MAX_LENGTH = 50;  // Set your desired maximum length here
                         
-                        // Coupon Code validation
-                        const code = document.getElementById('code');
-                        if (code.value.length < COUPON_CODE_MIN_LENGTH || code.value.length > COUPON_CODE_MAX_LENGTH) {
-                            document.getElementById('codeError').textContent = `Coupon code must be between ${COUPON_CODE_MIN_LENGTH} and ${COUPON_CODE_MAX_LENGTH} characters.`;
-                            isValid = false;
-                        } else {
-                            document.getElementById('codeError').textContent = '';
-                        }
+                            document.getElementById('couponForm').addEventListener('submit', function(event) {
+                                let isValid = true;
                         
-                        // Description validation
-                        const description = document.getElementById('description');
-                        if (description.value.length < DESCRIPTION_MIN_LENGTH || description.value.length > DESCRIPTION_MAX_LENGTH) {
-                            document.getElementById('descriptionError').textContent = `Description must be between ${DESCRIPTION_MIN_LENGTH} and ${DESCRIPTION_MAX_LENGTH} characters.`;
-                            isValid = false;
-                        } else {
-                            document.getElementById('descriptionError').textContent = '';
-                        }
+                                // Clear previous error messages
+                                document.getElementById('codeError').textContent = '';
+                                document.getElementById('descriptionError').textContent = '';
                         
-                        // Discount Percentage validation
-                        const discountPercentage = document.getElementById('discountPercentage');
-                        if (discountPercentage.value < 0 || discountPercentage.value > 99 || !/^\d+(\.\d{1,2})?$/.test(discountPercentage.value)) {
-                            document.getElementById('discountError').textContent = 'Discount must be between 0 and 99 with up to 2 decimal places.';
-                            isValid = false;
-                        } else {
-                            document.getElementById('discountError').textContent = '';
-                        }
+                                // Coupon Code validation
+                                const code = document.getElementById('code').value.trim();
+                                const validPattern = /^[a-zA-Z0-9 ]+$/; // Pattern for letters, numbers, and spaces
+                                if (code.length < COUPON_CODE_MIN_LENGTH || code.length > COUPON_CODE_MAX_LENGTH) {
+                                    document.getElementById('codeError').textContent = `Coupon code must be between ${COUPON_CODE_MIN_LENGTH} and ${COUPON_CODE_MAX_LENGTH} characters.`;
+                                    isValid = false;
+                                } else if (!validPattern.test(code)) {
+                                    document.getElementById('codeError').textContent = 'Coupon code can only contain letters, numbers, and spaces.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('codeError').textContent = '';
+                                }
                         
-                        // Minimum Purchase Amount validation
-                        const minPurchaseAmount = document.getElementById('minPurchaseAmount');
-                        if (minPurchaseAmount.value < 0 || !/^\d+(\.\d{1,2})?$/.test(minPurchaseAmount.value)) {
-                            document.getElementById('minPurchaseError').textContent = 'Minimum purchase amount must be a positive number with up to 2 decimal places.';
-                            isValid = false;
-                        } else {
-                            document.getElementById('minPurchaseError').textContent = '';
-                        }
-
-                        // Max Redeemable Value validation
-                        const maxRedeemableValue = document.getElementById('maxRedeemableValue');
-                        if (maxRedeemableValue.value < 0 || !/^\d+(\.\d{1,2})?$/.test(maxRedeemableValue.value)) {
-                            document.getElementById('maxRedeemableError').textContent = 'Max redeemable value must be a positive number with up to 2 decimal places.';
-                            isValid = false;
-                        } else {
-                            document.getElementById('maxRedeemableError').textContent = '';
-                        }
+                                // Description validation
+                                const description = document.getElementById('description').value.trim();
+                                if (description.length < DESCRIPTION_MIN_LENGTH || description.length > DESCRIPTION_MAX_LENGTH) {
+                                    document.getElementById('descriptionError').textContent = `Description must be between ${DESCRIPTION_MIN_LENGTH} and ${DESCRIPTION_MAX_LENGTH} characters.`;
+                                    isValid = false;
+                                } else if (!validPattern.test(description)) {
+                                    document.getElementById('descriptionError').textContent = 'Description can only contain letters, numbers, and spaces.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('descriptionError').textContent = '';
+                                }
                         
-                        // Quantity validation (Fixed)
-                        const quantity = document.getElementById('quantity');
-                        if (quantity.value === '' || quantity.value < 0 || !Number.isInteger(Number(quantity.value))) {
-                            document.getElementById('quantityError').textContent = 'Quantity must be a non-negative integer.';
-                            isValid = false;
-                        } else {
-                            document.getElementById('quantityError').textContent = '';
-                        }
-                                        
-                        // Expiry Date validation (Fixed)
-                        const expiryDate = document.getElementById('expiryDate');
-                        const currentDate = new Date();
-                        currentDate.setHours(0, 0, 0, 0);  // Set time to midnight for date comparison
-                        if (expiryDate.value === '' || new Date(expiryDate.value) < currentDate) {
-                            document.getElementById('expiryDateError').textContent = 'Expiry date must be today or in the future.';
-                            isValid = false;
-                        } else {
-                            document.getElementById('expiryDateError').textContent = '';
-                        }
+                                // Discount Percentage validation
+                                const discountPercentage = document.getElementById('discountPercentage');
+                                if (discountPercentage.value < 0 || discountPercentage.value > 99 || !/^\d+(\.\d{1,2})?$/.test(discountPercentage.value)) {
+                                    document.getElementById('discountError').textContent = 'Discount must be between 0 and 99 with up to 2 decimal places.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('discountError').textContent = '';
+                                }
                         
-                        if (!isValid) {
-                            event.preventDefault();
-                        }
-                    });
-                                            </script>
+                                // Minimum Purchase Amount validation
+                                const minPurchaseAmount = document.getElementById('minPurchaseAmount');
+                                if (minPurchaseAmount.value < 0 || !/^\d+(\.\d{1,2})?$/.test(minPurchaseAmount.value)) {
+                                    document.getElementById('minPurchaseError').textContent = 'Minimum purchase amount must be a positive number with up to 2 decimal places.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('minPurchaseError').textContent = '';
+                                }
+                        
+                                // Max Redeemable Value validation
+                                const maxRedeemableValue = document.getElementById('maxRedeemableValue');
+                                if (maxRedeemableValue.value < 0 || !/^\d+(\.\d{1,2})?$/.test(maxRedeemableValue.value)) {
+                                    document.getElementById('maxRedeemableError').textContent = 'Max redeemable value must be a positive number with up to 2 decimal places.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('maxRedeemableError').textContent = '';
+                                }
+                        
+                                // Quantity validation (Fixed)
+                                const quantity = document.getElementById('quantity');
+                                if (quantity.value === '' || quantity.value < 0 || !Number.isInteger(Number(quantity.value))) {
+                                    document.getElementById('quantityError').textContent = 'Quantity must be a non-negative integer.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('quantityError').textContent = '';
+                                }
+                        
+                                // Expiry Date validation (Fixed)
+                                const expiryDate = document.getElementById('expiryDate');
+                                const currentDate = new Date();
+                                currentDate.setHours(0, 0, 0, 0);  // Set time to midnight for date comparison
+                                if (expiryDate.value === '' || new Date(expiryDate.value) < currentDate) {
+                                    document.getElementById('expiryDateError').textContent = 'Expiry date must be today or in the future.';
+                                    isValid = false;
+                                } else {
+                                    document.getElementById('expiryDateError').textContent = '';
+                                }
+                        
+                                if (!isValid) {
+                                    event.preventDefault();
+                                }
+                            });
+                        </script>
+                        
                         
                         
                       </div>

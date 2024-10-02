@@ -25,8 +25,7 @@
         <div class="col-search">
             <form class="searchform">
                 <div class="input-group">
-                    <input list="search_terms" type="text" class="form-control" placeholder="Search term">
-                    <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    <input type="text" name="search" placeholder="Search Products" class="form-control bg-white">
                 </div>
                 <datalist id="search_terms">
                     <option value="Products">
@@ -39,39 +38,14 @@
         <div class="col-nav">
             <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
             <ul class="nav">
-                <li class="nav-item">
-                    <a class="nav-link btn-icon" href="#">
-                        <i class="material-icons md-notifications animation-shake"></i>
-                        <span class="badge rounded-pill">3</span>
-                    </a>
-                </li>
+              
                 <li class="nav-item">
                     <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
                 </li>
-                <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
-                        <a class="dropdown-item text-brand" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-us.png' %}" alt="English">English</a>
-                        <a class="dropdown-item" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-fr.png' %}" alt="Français">Français</a>
-                        <a class="dropdown-item" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-jp.png' %}" alt="Français">日本語</a>
-                        <a class="dropdown-item" href="#"><img src="{% static 'admin/assets/imgs/theme/flag-cn.png' %}" alt="Français">中国人</a>
-                    </div>
-                </li>
-                <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="{% static 'admin/assets/imgs/people/avatar2.jpg' %}" alt="User"></a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
-                        <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
-                        <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
-                        <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
-                        <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
-                    </div>
-                </li>
+                
             </ul>
         </div>
     </header>
@@ -90,21 +64,65 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <form method="POST" enctype="multipart/form-data" action="{% url 'adminaddcat' %}">
+                        <form method="POST" enctype="multipart/form-data" action="{% url 'adminaddcat' %}" id="categoryForm">
                             {% csrf_token %}
                             <div class="mb-4">
-                                <label for="product_name" class="form-label">Name</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_name" name="name" minlength="3" maxlength="100" >
+                                <label for="category_name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="category_name" name="name" minlength="3" maxlength="100">
+                                <small id="nameError" class="text-danger"></small>
                             </div>
                             
                             <div class="mb-4">
-                                <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" class="form-control" name="description" minlength="10" maxlength="500" ></textarea>
+                                <label for="description" class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" id="description" name="description" minlength="10" maxlength="500"></textarea>
+                                <small id="descriptionError" class="text-danger"></small>
                             </div>
+                            
                             <div class="d-grid">
-                                <button class="btn btn-primary" type="submit">Create category</button>
+                                <button class="btn btn-primary" type="submit" onclick="return validateForm()">Create category</button>
                             </div>
                         </form>
+<script>
+    function validateForm() {
+    // Get form fields
+    let categoryName = document.getElementById("category_name");
+    let description = document.getElementById("description");
+
+    // Get error message elements
+    let nameError = document.getElementById("nameError");
+    let descriptionError = document.getElementById("descriptionError");
+
+    // Reset styles and error messages
+    categoryName.style.borderColor = "";
+    description.style.borderColor = "";
+    nameError.textContent = "";
+    descriptionError.textContent = "";
+
+    // Initialize validation flag
+    let isValid = true;
+
+    // Regex pattern to allow only letters, numbers, and spaces
+    let validPattern = /^[a-zA-Z0-9 ]+$/;
+
+    // Validate category name (between 3 and 100 characters and no special characters)
+    if (categoryName.value.length < 3 || categoryName.value.length > 15 || !validPattern.test(categoryName.value)) {
+        categoryName.style.borderColor = "red";
+        nameError.textContent = "Name must be between 3 and 15 characters and contain only letters, numbers, and spaces.";
+        isValid = false;
+    }
+
+    // Validate description (between 10 and 500 characters and no special characters)
+    if (description.value.length < 10 || description.value.length > 50 || !validPattern.test(description.value)) {
+        description.style.borderColor = "red";
+        descriptionError.textContent = "Description must be between 10 and 50 characters and contain only letters, numbers, and spaces.";
+        isValid = false;
+    }
+
+    // Return validation status
+    return isValid;
+}
+
+</script>                        
                         
                     </div>
                     <div class="col-md-9">
@@ -218,43 +236,6 @@
         </div>
     </footer>
 </main>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            const nameInput = document.getElementById('product_name');
-            const descriptionTextarea = document.querySelector('textarea[name="description"]');
-            
-            // Custom error messages
-            let valid = true;
-            let errorMessage = '';
 
-            // Validate Name
-            if (nameInput.value.length < 3) {
-                valid = false;
-                errorMessage += 'Name must be at least 3 characters long.\n';
-            }
-            if (nameInput.value.length > 100) {
-                valid = false;
-                errorMessage += 'Name must be less than 100 characters long.\n';
-            }
-
-            // Validate Description
-            if (descriptionTextarea.value.length < 10) {
-                valid = false;
-                errorMessage += 'Description must be at least 10 characters long.\n';
-            }
-            if (descriptionTextarea.value.length > 500) {
-                valid = false;
-                errorMessage += 'Description must be less than 500 characters long.\n';
-            }
-
-            if (!valid) {
-                alert(errorMessage);
-                event.preventDefault(); // Prevent form submission
-            }
-        });
-    });
-</script>
 
 {% endblock content %}

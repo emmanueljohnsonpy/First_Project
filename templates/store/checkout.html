@@ -217,25 +217,7 @@
                                 <dt>Shipping Fee:</dt>
                                 <dd class="text-right">₹ {{ checkout_details.shipping_fee }}</dd>
                             </dl>
-                            <!-- <dl class="dlist-align">
-                                <dt>Grand Total:</dt>
-                                <dd class="text-right text-dark b">
-                                    <strong id="grand-total">₹ {{ checkout_details.grand_total }}</strong>
-                                </dd>
-                            </dl> -->
-                            <!-- <dl class="dlist-align">
-                                <dt>Grand Total:</dt>
-                                <dd class="text-right text-dark b">
-                                    <strong id="grand-total">₹ {{ checkout_details.grand_total }}</strong>
-                                </dd>
-                            </dl>
-                            
-                            <dl class="dlist-align" id="discounted-price" style="display: none;">
-                                <dt>New Price (After Coupon):</dt>
-                                <dd class="text-right text-success b">
-                                    <strong id="discounted-total"></strong>
-                                </dd>
-                            </dl> -->
+                          
                             <dl class="dlist-align" id="discounted-price" style="display: none;">
                                 <dt></dt>
                                 <dd class="text-right text-success b">
@@ -283,6 +265,8 @@
                 
                     <button type="submit" name="submit" class="btn btn-primary btn-block">Place Order</button>
                     <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                    <input type="hidden" id="coupon_id" name="coupon_id" value="{{ request.session.coupon_id }}">
+
                 </form>
                 <!-- Modal for payment failure -->
                 <div id="payment-failure-modal" style="display: none;">
@@ -500,11 +484,13 @@
                     {% csrf_token %}
                     <div class="form-group mb-3">
                         <label for="full_name">Full name *</label>
-                        <input type="text" id="full_name" name="full_name" class="form-control" required>
+                        <input type="text" id="full_name" name="full_name" class="form-control">
+                        <span id="full_name_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <div class="form-group mb-3">
                         <label for="address">Address *</label>
-                        <input type="text" id="address" name="address" class="form-control" required>
+                        <input type="text" id="address" name="address" class="form-control">
+                        <span id="address_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <div class="form-group mb-3">
                         <label for="address_line2">Address line2</label>
@@ -512,26 +498,68 @@
                     </div>
                     <div class="form-group mb-3">
                         <label for="city">City / Town *</label>
-                        <input type="text" id="city" name="city" class="form-control" required>
+                        <input type="text" id="city" name="city" class="form-control">
+                        <span id="city_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <div class="form-group mb-3">
                         <label for="state">State *</label>
-                        <input type="text" id="state" name="state" class="form-control" required>
+                        <input type="text" id="state" name="state" class="form-control">
+                        <span id="state_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <div class="form-group mb-3">
                         <label for="pincode">Pincode / ZIP *</label>
-                        <input type="text" id="pincode" name="pincode" class="form-control" required>
+                        <input type="text" id="pincode" name="pincode" class="form-control">
+                        <span id="pincode_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <div class="form-group mb-3">
                         <label for="phone">Phone *</label>
-                        <input type="text" id="phone" name="phone" class="form-control" required>
+                        <input type="text" id="phone" name="phone" class="form-control">
+                        <span id="phone_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <div class="form-group mb-3">
                         <label for="email">Email address *</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
+                        <input type="email" id="email" name="email" class="form-control">
+                        <span id="email_error" class="text-danger"></span> <!-- Error message -->
                     </div>
                     <button type="submit" class="btn btn-primary">Add Address</button>
                 </form>
+                
+                <!-- <form id="addressForm" action="{% url 'orders_address' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="full_name">Full name *</label>
+                        <input type="text" id="full_name" name="full_name" class="form-control" >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="address">Address *</label>
+                        <input type="text" id="address" name="address" class="form-control" >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="address_line2">Address line2</label>
+                        <input type="text" id="address_line2" name="address_line2" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="city">City / Town *</label>
+                        <input type="text" id="city" name="city" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" name="state" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="pincode">Pincode / ZIP *</label>
+                        <input type="text" id="pincode" name="pincode" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="phone">Phone *</label>
+                        <input type="text" id="phone" name="phone" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="email">Email address *</label>
+                        <input type="email" id="email" name="email" class="form-control"  >
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Address</button>
+                </form> -->
             </div>
         </div>
     </div>
@@ -549,11 +577,13 @@
                     <input type="hidden" id="edit_address_id" name="address_id">
                     <div class="form-group mb-3">
                         <label for="edit_full_name">Full name *</label>
-                        <input type="text" id="edit_full_name" name="full_name" class="form-control" required>
+                        <input type="text" id="edit_full_name" name="full_name" class="form-control">
+                        <div class="invalid-feedback" id="edit_full_name_error"></div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_address">Address *</label>
-                        <input type="text" id="edit_address" name="address" class="form-control" required>
+                        <input type="text" id="edit_address" name="address" class="form-control">
+                        <div class="invalid-feedback" id="edit_address_error"></div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_address_line2">Address line2</label>
@@ -561,26 +591,181 @@
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_city">City / Town *</label>
-                        <input type="text" id="edit_city" name="city" class="form-control" required>
+                        <input type="text" id="edit_city" name="city" class="form-control">
+                        <div class="invalid-feedback" id="edit_city_error"></div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_state">State *</label>
-                        <input type="text" id="edit_state" name="state" class="form-control" required>
+                        <input type="text" id="edit_state" name="state" class="form-control">
+                        <div class="invalid-feedback" id="edit_state_error"></div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_pincode">Pincode / ZIP *</label>
-                        <input type="text" id="edit_pincode" name="pincode" class="form-control" required>
+                        <input type="text" id="edit_pincode" name="pincode" class="form-control">
+                        <div class="invalid-feedback" id="edit_pincode_error"></div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_phone">Phone *</label>
-                        <input type="text" id="edit_phone" name="phone" class="form-control" required>
+                        <input type="text" id="edit_phone" name="phone" class="form-control">
+                        <div class="invalid-feedback" id="edit_phone_error"></div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="edit_email">Email address *</label>
-                        <input type="email" id="edit_email" name="email" class="form-control" required>
+                        <input type="email" id="edit_email" name="email" class="form-control">
+                        <div class="invalid-feedback" id="edit_email_error"></div>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Address</button>
                 </form>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const form = document.getElementById('editAddressForm');
+                
+                        form.addEventListener('submit', function (event) {
+                            let isValid = true;
+                
+                            // Full Name validation
+                            const fullName = document.getElementById('edit_full_name');
+                            const fullNameError = document.getElementById('edit_full_name_error');
+                            const fullNameValue = fullName.value.trim();
+                            const fullNamePattern = /^[A-Za-z\s]+$/;
+                
+                            if (!fullNamePattern.test(fullNameValue) || fullNameValue.length < 8 || fullNameValue.length > 20) {
+                                fullNameError.textContent = 'Full name must be 8-20 characters long and contain only letters and spaces.';
+                                fullName.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                fullNameError.textContent = '';
+                                fullName.classList.remove('is-invalid');
+                            }
+                
+                            // Address validation
+                            const address = document.getElementById('edit_address');
+                            const addressError = document.getElementById('edit_address_error');
+                            const addressValue = address.value.trim();
+                            const addressMinLength = 10;
+                            const addressMaxLength = 50;
+                
+                            if (addressValue.length < addressMinLength || addressValue.length > addressMaxLength || 
+                                /^(\*+|\s+|[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)$/.test(addressValue)) {
+                                addressError.textContent = 'Address must be between 10 and 50 characters and cannot be just special characters.';
+                                address.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                addressError.textContent = '';
+                                address.classList.remove('is-invalid');
+                            }
+                
+                            // City validation
+                            const city = document.getElementById('edit_city');
+                            const cityError = document.getElementById('edit_city_error');
+                            const cityPattern = /^[A-Za-z]{3,20}$/; // Letters only, min 3 and max 20 characters
+                            if (!cityPattern.test(city.value.trim())) {
+                                cityError.textContent = 'City must be 3-20 letters and contain no special characters or numbers.';
+                                city.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                cityError.textContent = '';
+                                city.classList.remove('is-invalid');
+                            }
+                
+                            // State validation
+                            const state = document.getElementById('edit_state');
+                            const stateError = document.getElementById('edit_state_error');
+                            const statePattern = /^[A-Za-z]{3,20}$/; // Letters only, min 3 and max 20 characters
+                            if (!statePattern.test(state.value.trim())) {
+                                stateError.textContent = 'State must be 3-20 letters and contain no special characters or numbers.';
+                                state.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                stateError.textContent = '';
+                                state.classList.remove('is-invalid');
+                            }
+                
+                            // Pincode validation
+                            const pincode = document.getElementById('edit_pincode');
+                            const pincodeError = document.getElementById('edit_pincode_error');
+                            const pincodePattern = /^\d{6}$/; // Exactly 6 numbers
+                            if (!pincodePattern.test(pincode.value.trim())) {
+                                pincodeError.textContent = 'Pincode must be exactly 6 digits.';
+                                pincode.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                pincodeError.textContent = '';
+                                pincode.classList.remove('is-invalid');
+                            }
+                
+                            // Phone number validation
+                            const phone = document.getElementById('edit_phone');
+                            const phoneError = document.getElementById('edit_phone_error');
+                            const phonePattern = /^\d{10}$/; // Exactly 10 numbers
+                            if (!phonePattern.test(phone.value.trim())) {
+                                phoneError.textContent = 'Phone number must be exactly 10 digits.';
+                                phone.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                phoneError.textContent = '';
+                                phone.classList.remove('is-invalid');
+                            }
+                
+                            // Email validation
+                            const email = document.getElementById('edit_email');
+                            const emailError = document.getElementById('edit_email_error');
+                            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Email format
+                            if (!emailPattern.test(email.value.trim())) {
+                                emailError.textContent = 'Please enter a valid email address.';
+                                email.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                emailError.textContent = '';
+                                email.classList.remove('is-invalid');
+                            }
+                
+                            // Prevent form submission if validation fails
+                            if (!isValid) {
+                                event.preventDefault(); // Prevent the form from submitting
+                            }
+                        });
+                    });
+                </script>
+                
+                <!-- <form id="editAddressForm" action="{% url 'update_address' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit_address_id" name="address_id">
+                    <div class="form-group mb-3">
+                        <label for="edit_full_name">Full name *</label>
+                        <input type="text" id="edit_full_name" name="full_name" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_address">Address *</label>
+                        <input type="text" id="edit_address" name="address" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_address_line2">Address line2</label>
+                        <input type="text" id="edit_address_line2" name="address_line2" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_city">City / Town *</label>
+                        <input type="text" id="edit_city" name="city" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_state">State *</label>
+                        <input type="text" id="edit_state" name="state" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_pincode">Pincode / ZIP *</label>
+                        <input type="text" id="edit_pincode" name="pincode" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_phone">Phone *</label>
+                        <input type="text" id="edit_phone" name="phone" class="form-control"  >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_email">Email address *</label>
+                        <input type="email" id="edit_email" name="email" class="form-control"  >
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Address</button>
+                </form> -->
             </div>
         </div>
     </div>
@@ -787,6 +972,8 @@ input:checked + label:hover, input:checked ~ label:hover, input:checked ~ label:
         });
     });
 });
+// Keep track of whether a coupon is currently applied
+let couponApplied = false;
 
 function checkCouponStatus() {
     fetch("{% url 'check_coupon_status' %}", {
@@ -798,27 +985,107 @@ function checkCouponStatus() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success && data.coupon_applied) {
-            document.getElementById('discounted-total').textContent = '₹ ' + data.grand_total;
-            document.getElementById('grand-total').innerHTML = '<s>₹ ' + data.original_total + '</s>';
-            document.getElementById('discounted-price').style.display = 'block';
-            document.getElementById('coupon-status').style.display = 'block';
-            document.getElementById('coupon-form').style.display = 'none';
-            document.getElementById('remove-coupon-btn').style.display = 'block';
-            document.getElementById('coupon-code').value = data.coupon_code;
-        } else {
-            document.getElementById('grand-total').textContent = '₹ ' + data.grand_total;
-            document.getElementById('discounted-price').style.display = 'none';
-            document.getElementById('coupon-status').style.display = 'none';
-            document.getElementById('coupon-form').style.display = 'flex';
-            document.getElementById('remove-coupon-btn').style.display = 'none';
-            document.getElementById('coupon-code').value = '';
-        }
+        updateUIWithCouponStatus(data);
     })
     .catch(error => {
         console.error('Error checking coupon status:', error);
     });
 }
+
+function updateUIWithCouponStatus(data) {
+    if (data.success && data.coupon_applied) {
+        couponApplied = true;
+        showDiscountedPrice(data);
+    } else {
+        couponApplied = false;
+        hideDiscountedPrice(data);
+    }
+}
+
+function showDiscountedPrice(data) {
+    document.getElementById('discounted-total').textContent = '₹ ' + data.grand_total;
+    document.getElementById('grand-total').innerHTML = '<s>₹ ' + data.original_total + '</s>';
+    document.getElementById('discounted-price').style.display = 'block';
+    document.getElementById('coupon-status').style.display = 'block';
+    document.getElementById('coupon-form').style.display = 'none';
+    document.getElementById('remove-coupon-btn').style.display = 'block';
+    document.getElementById('coupon-code').value = data.coupon_code;
+}
+
+function hideDiscountedPrice(data) {
+    document.getElementById('grand-total').textContent = '₹ ' + data.grand_total;
+    document.getElementById('discounted-price').style.display = 'none';
+    document.getElementById('coupon-status').style.display = 'none';
+    document.getElementById('coupon-form').style.display = 'flex';
+    document.getElementById('remove-coupon-btn').style.display = 'none';
+    document.getElementById('coupon-code').value = '';
+}
+
+// Add event listener for coupon form submission
+document.getElementById('coupon-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (couponApplied) {
+        alert('A coupon is already applied. Please remove the current coupon before applying a new one.');
+        return;
+    }
+    applyCoupon();
+});
+
+function applyCoupon() {
+    const couponCode = document.getElementById('coupon-code').value;
+    fetch("{% url 'apply_coupon' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: JSON.stringify({
+            coupon_code: couponCode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            couponApplied = true;
+            updateUIWithCouponStatus(data);
+        } else {
+            alert(data.message || 'Failed to apply coupon');
+        }
+    })
+    .catch(error => {
+        console.error('Error applying coupon:', error);
+    });
+}
+
+// Add event listener for remove coupon button
+document.getElementById('remove-coupon-btn').addEventListener('click', function() {
+    removeCoupon();
+});
+
+function removeCoupon() {
+    fetch("{% url 'remove_coupon' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            couponApplied = false;
+            updateUIWithCouponStatus(data);
+        } else {
+            alert('Failed to remove coupon');
+        }
+    })
+    .catch(error => {
+        console.error('Error removing coupon:', error);
+    });
+}
+
+// Check coupon status when page loads
+document.addEventListener('DOMContentLoaded', checkCouponStatus);
 </script>
 <!-- 
 
@@ -1080,7 +1347,119 @@ function checkCouponStatus() {
     }
 </script> -->
 
-      
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('addressForm');
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Full Name validation
+            const fullName = document.getElementById('full_name');
+            const fullNameError = document.getElementById('full_name_error');
+            const fullNameValue = fullName.value.trim(); // Trim whitespace from both ends
+            const fullNamePattern = /^[A-Za-z\s]+$/; // Allow letters and spaces only
+
+            if (!fullNamePattern.test(fullNameValue) || fullNameValue.length < 8 || fullNameValue.length > 20) {
+                fullNameError.textContent = 'Full name must be 8-20 characters long and contain only letters and spaces.';
+                fullName.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                fullNameError.textContent = '';
+                fullName.classList.remove('is-invalid');
+            }
+
+            // Address validation
+            const address = document.getElementById('address');
+            const addressError = document.getElementById('address_error');
+            const addressValue = address.value.trim();
+            const addressMinLength = 10;
+            const addressMaxLength = 50;
+
+            // Check for length and non-repeated characters
+            if (addressValue.length < addressMinLength || addressValue.length > addressMaxLength || 
+                /^(\*+|\s+|[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)$/.test(addressValue)) {
+                addressError.textContent = 'Address must be between 10 and 50 characters and cannot be just special characters.';
+                address.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                addressError.textContent = '';
+                address.classList.remove('is-invalid');
+            }
+
+            // City validation
+            const city = document.getElementById('city');
+            const cityError = document.getElementById('city_error');
+            const cityPattern = /^[A-Za-z]{3,20}$/; // Letters only, min 3 and max 20 characters
+            if (!cityPattern.test(city.value.trim())) {
+                cityError.textContent = 'City must be 3-20 letters and contain no special characters or numbers.';
+                city.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                cityError.textContent = '';
+                city.classList.remove('is-invalid');
+            }
+
+            // State validation
+            const state = document.getElementById('state');
+            const stateError = document.getElementById('state_error');
+            const statePattern = /^[A-Za-z]{3,20}$/; // Letters only, min 3 and max 20 characters
+            if (!statePattern.test(state.value.trim())) {
+                stateError.textContent = 'State must be 3-20 letters and contain no special characters or numbers.';
+                state.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                stateError.textContent = '';
+                state.classList.remove('is-invalid');
+            }
+
+            // Pincode validation
+            const pincode = document.getElementById('pincode');
+            const pincodeError = document.getElementById('pincode_error');
+            const pincodePattern = /^\d{6}$/; // Exactly 6 numbers
+            if (!pincodePattern.test(pincode.value.trim())) {
+                pincodeError.textContent = 'Pincode must be exactly 6 digits.';
+                pincode.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                pincodeError.textContent = '';
+                pincode.classList.remove('is-invalid');
+            }
+
+            // Phone number validation
+            const phone = document.getElementById('phone');
+            const phoneError = document.getElementById('phone_error');
+            const phonePattern = /^\d{10}$/; // Exactly 10 numbers
+            if (!phonePattern.test(phone.value.trim())) {
+                phoneError.textContent = 'Phone number must be exactly 10 digits.';
+                phone.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                phoneError.textContent = '';
+                phone.classList.remove('is-invalid');
+            }
+
+            // Email validation
+            const email = document.getElementById('email');
+            const emailError = document.getElementById('email_error');
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Email format
+            if (!emailPattern.test(email.value.trim())) {
+                emailError.textContent = 'Please enter a valid email address.';
+                email.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                emailError.textContent = '';
+                email.classList.remove('is-invalid');
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault(); // Prevent the form from submitting
+            }
+        });
+    });
+</script>
+
 {% endblock %}
 
 

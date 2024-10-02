@@ -32,33 +32,32 @@
         <div class="row">
             <div class="col-9">
                 <div class="content-header">
-                    <h2 class="content-title">Add Category Offer</h2>
+                    <h2 class="content-title">Edit Category Offer</h2>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h4>Offer Details</h4>
+                        <h4>Edit Details</h4>
                     </div>
                     <div class="card-body">
                         <form id="offerForm" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            <!-- Include hidden field for product ID if editing an existing product -->
-                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="offer_id" value="{{ offer.id }}">
                         
                             <div class="mb-4">
                                 <label for="offer_name" class="form-label">Offer Name:</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="offer_name" name="offer_name" value="{{ product.offer_name }}">
+                                <input type="text" placeholder="Type here" class="form-control" id="offer_name" name="offer_name" value="{{ offer.offer_name }}">
                                 <div id="offer_name_error" class="text-danger"></div>
                             </div>
                             <div class="mb-4">
                                 <label for="description" class="form-label">Description:</label>
-                                <textarea placeholder="Type here" class="form-control" id="description" name="description" rows="4">{{ product.description }}</textarea>
+                                <textarea placeholder="Type here" class="form-control" id="description" name="description" rows="4">{{ offer.description }}</textarea>
                                 <div id="description_error" class="text-danger"></div>
                             </div>
                             <div class="mb-4">
                                 <label for="offer_percentage" class="form-label">Offer Percentage:</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="offer_percentage" name="offer_percentage" value="{{ product.offer_percentage }}">
+                                <input type="text" placeholder="Type here" class="form-control" id="offer_percentage" name="offer_percentage" value="{{ offer.offer_percentage }}">
                                 <div id="offer_percentage_error" class="text-danger"></div>
                             </div>
                             <div class="mb-4">

@@ -63,6 +63,7 @@
                                         Remove Offer
                                     </button>
                                 </form>
+                                <p>Offer Applied: <strong>{{ product.applied_offer_name }}</strong> (Discount: {{ product.applied_offer_percentage|floatformat:0 }}%)</p>                                 
                             {% else %}
                                 <form method="POST" action="{% url 'apply_offer_to_category' %}">
                                     {% csrf_token %}

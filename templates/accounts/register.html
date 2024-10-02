@@ -61,7 +61,6 @@
 
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
-
 <script>
     document.getElementById('registrationForm').addEventListener('submit', function(event) {
         let isValid = true;
@@ -71,20 +70,27 @@
             error.textContent = '';
         });
 
-        // Check first name
+        // Check first name (letters only, between 5 and 10 characters)
         const firstName = document.getElementById('id_first_name');
+        const namePattern = /^[A-Za-z]+$/;
         if (!firstName.value.trim()) {
             document.getElementById('first_name_error').textContent = 'First name is required';
+            isValid = false;
+        } else if (!namePattern.test(firstName.value.trim())) {
+            document.getElementById('first_name_error').textContent = 'First name can only contain letters';
             isValid = false;
         } else if (firstName.value.trim().length < 5 || firstName.value.trim().length > 10) {
             document.getElementById('first_name_error').textContent = 'First name must be between 5 and 10 characters';
             isValid = false;
         }
 
-        // Check last name
+        // Check last name (letters only, between 5 and 10 characters)
         const lastName = document.getElementById('id_last_name');
         if (!lastName.value.trim()) {
             document.getElementById('last_name_error').textContent = 'Last name is required';
+            isValid = false;
+        } else if (!namePattern.test(lastName.value.trim())) {
+            document.getElementById('last_name_error').textContent = 'Last name can only contain letters';
             isValid = false;
         } else if (lastName.value.trim().length < 5 || lastName.value.trim().length > 10) {
             document.getElementById('last_name_error').textContent = 'Last name must be between 5 and 10 characters';
@@ -102,21 +108,25 @@
             isValid = false;
         }
 
-        // Check phone number
+        // Check phone number (numbers only, exactly 10 digits)
         const phoneNumber = document.getElementById('id_phone_number');
+        const phonePattern = /^[0-9]{10}$/;
         if (!phoneNumber.value.trim()) {
             document.getElementById('phone_number_error').textContent = 'Phone number is required';
             isValid = false;
+        } else if (!phonePattern.test(phoneNumber.value.trim())) {
+            document.getElementById('phone_number_error').textContent = 'Phone number must be 10 digits long and contain only numbers';
+            isValid = false;
         }
 
-        // Check password
+        // Check password (must contain at least one uppercase, one lowercase, one special character, and 8+ characters)
         const password = document.getElementById('id_password');
-        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
         if (!password.value.trim()) {
             document.getElementById('password_error').textContent = 'Password is required';
             isValid = false;
         } else if (!passwordPattern.test(password.value.trim())) {
-            document.getElementById('password_error').textContent = 'Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, and one number or symbol';
+            document.getElementById('password_error').textContent = 'Password must be at least 8 characters, and include uppercase, lowercase letter, number, and special character';
             isValid = false;
         }
 
@@ -133,11 +143,13 @@
             isValid = false;
         }
 
+        // Prevent form submission if validation fails
         if (!isValid) {
             event.preventDefault();
         }
     });
 </script>
+
 
 
 {% endblock %}

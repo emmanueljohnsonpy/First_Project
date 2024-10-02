@@ -76,31 +76,33 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         const form = document.getElementById('editProfileForm');
-                
+                    
                         form.addEventListener('submit', function(event) {
                             let isValid = true;
                             
-                            // Validate First Name
+                            // Validate First Name (5-10 characters, only letters, no numbers or special characters)
                             const firstName = document.getElementById('first_name');
                             const firstNameError = document.getElementById('first_name_error');
-                            if (firstName.value.trim().length < 3 || firstName.value.trim().length > 15) {
-                                firstNameError.textContent = 'First name must be between 3 and 15 characters.';
+                            const firstNameValue = firstName.value.trim();
+                            if (firstNameValue.length < 5 || firstNameValue.length > 10 || !/^[a-zA-Z]+$/.test(firstNameValue)) {
+                                firstNameError.textContent = 'First name must be between 5 and 10 characters and contain only letters (no numbers or special characters).';
                                 isValid = false;
                             } else {
                                 firstNameError.textContent = '';
                             }
-                
-                            // Validate Last Name
+                    
+                            // Validate Last Name (5-10 characters, only letters, no numbers or special characters)
                             const lastName = document.getElementById('last_name');
                             const lastNameError = document.getElementById('last_name_error');
-                            if (lastName.value.trim().length < 3 || lastName.value.trim().length > 15) {
-                                lastNameError.textContent = 'Last name must be between 3 and 15 characters.';
+                            const lastNameValue = lastName.value.trim();
+                            if (lastNameValue.length < 5 || lastNameValue.length > 10 || !/^[a-zA-Z]+$/.test(lastNameValue)) {
+                                lastNameError.textContent = 'Last name must be between 5 and 10 characters and contain only letters (no numbers or special characters).';
                                 isValid = false;
                             } else {
                                 lastNameError.textContent = '';
                             }
-                
-                            // Validate Phone Number
+                    
+                            // Validate Phone Number (exactly 10 digits)
                             const phoneNumber = document.getElementById('phone_number');
                             const phoneNumberError = document.getElementById('phone_number_error');
                             const phoneNumberValue = phoneNumber.value.trim();
@@ -110,13 +112,15 @@
                             } else {
                                 phoneNumberError.textContent = '';
                             }
-                
+                    
                             if (!isValid) {
                                 event.preventDefault(); // Prevent form submission if validation fails
                             }
                         });
                     });
                 </script>
+                
+                
                 
             </div>
         </div>

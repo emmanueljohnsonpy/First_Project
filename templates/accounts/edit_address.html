@@ -13,15 +13,17 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title mb-4">Edit Address</h4>
-                                <form action="{% url 'edit_address' address.id %}" method="POST">
+                                <form action="{% url 'edit_address' address.id %}" method="POST" id="addressForm">
                                     {% csrf_token %}
                                     <div class="form-group">
                                         <label for="full_name">Full name *</label>
-                                        <input type="text" id="full_name" name="full_name" class="form-control" value="{{ address.full_name }}" required>
+                                        <input type="text" id="full_name" name="full_name" class="form-control" value="{{ address.full_name }}"  >
+                                        <div id="full_name_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <div class="form-group">
                                         <label for="address">Address *</label>
-                                        <input type="text" id="address" name="address" class="form-control" value="{{ address.address }}" required>
+                                        <input type="text" id="address" name="address" class="form-control" value="{{ address.address }}"  >
+                                        <div id="address_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <div class="form-group">
                                         <label for="address_line2">Address line2</label>
@@ -29,26 +31,148 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="city">City / Town *</label>
-                                        <input type="text" id="city" name="city" class="form-control" value="{{ address.city }}" required>
+                                        <input type="text" id="city" name="city" class="form-control" value="{{ address.city }}"  >
+                                        <div id="city_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <div class="form-group">
                                         <label for="state">State *</label>
-                                        <input type="text" id="state" name="state" class="form-control" value="{{ address.state }}" required>
+                                        <input type="text" id="state" name="state" class="form-control" value="{{ address.state }}"  >
+                                        <div id="state_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <div class="form-group">
                                         <label for="pincode">Pincode / ZIP *</label>
-                                        <input type="text" id="pincode" name="pincode" class="form-control" value="{{ address.pincode }}" required>
+                                        <input type="text" id="pincode" name="pincode" class="form-control" value="{{ address.pincode }}"  >
+                                        <div id="pincode_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <div class="form-group">
                                         <label for="phone">Phone *</label>
-                                        <input type="text" id="phone" name="phone" class="form-control" value="{{ address.phone }}" required>
+                                        <input type="text" id="phone" name="phone" class="form-control" value="{{ address.phone }}"  >
+                                        <div id="phone_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <div class="form-group">
                                         <label for="email">Email address *</label>
-                                        <input type="email" id="email" name="email" class="form-control" value="{{ address.email }}" required>
+                                        <input type="email" id="email" name="email" class="form-control" value="{{ address.email }}"  >
+                                        <div id="email_error" class="invalid-feedback"></div> <!-- Error message -->
                                     </div>
                                     <button type="submit" class="btn btn-primary">Update Address</button>
                                 </form>
+                                
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const form = document.getElementById('addressForm');
+                                
+                                        form.addEventListener('submit', function (event) {
+                                            let isValid = true;
+                                
+                                            // Full Name validation
+                                            const fullName = document.getElementById('full_name');
+                                            const fullNameError = document.getElementById('full_name_error');
+                                            const fullNameValue = fullName.value.trim(); // Trim whitespace from both ends
+                                            const fullNamePattern = /^[A-Za-z\s]+$/; // Allow letters and spaces only
+                                
+                                            if (!fullNamePattern.test(fullNameValue) || fullNameValue.length < 8 || fullNameValue.length > 20) {
+                                                fullNameError.textContent = 'Full name must be 8-20 characters long and contain only letters and spaces.';
+                                                fullName.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                fullNameError.textContent = '';
+                                                fullName.classList.remove('is-invalid');
+                                            }
+                                
+                                            // Address validation
+                                            const address = document.getElementById('address');
+                                            const addressError = document.getElementById('address_error');
+                                            const addressValue = address.value.trim();
+                                            const addressMinLength = 10;
+                                            const addressMaxLength = 50;
+                                
+                                            // Check for length and non-repeated characters
+                                            if (addressValue.length < addressMinLength || addressValue.length > addressMaxLength || 
+                                                /^(\*+|\s+|[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)$/.test(addressValue)) {
+                                                addressError.textContent = 'Address must be between 10 and 50 characters and cannot be just special characters.';
+                                                address.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                addressError.textContent = '';
+                                                address.classList.remove('is-invalid');
+                                            }
+                                
+                                            // City validation
+                                            const city = document.getElementById('city');
+                                            const cityError = document.getElementById('city_error');
+                                            const cityPattern = /^[A-Za-z]{3,20}$/; // Letters only, min 3 and max 20 characters
+                                            if (!cityPattern.test(city.value.trim())) {
+                                                cityError.textContent = 'City must be 3-20 letters and contain no special characters or numbers.';
+                                                city.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                cityError.textContent = '';
+                                                city.classList.remove('is-invalid');
+                                            }
+                                
+                                            // State validation
+                                            const state = document.getElementById('state');
+                                            const stateError = document.getElementById('state_error');
+                                            const statePattern = /^[A-Za-z]{3,20}$/; // Letters only, min 3 and max 20 characters
+                                            if (!statePattern.test(state.value.trim())) {
+                                                stateError.textContent = 'State must be 3-20 letters and contain no special characters or numbers.';
+                                                state.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                stateError.textContent = '';
+                                                state.classList.remove('is-invalid');
+                                            }
+                                
+                                            // Pincode validation
+                                            const pincode = document.getElementById('pincode');
+                                            const pincodeError = document.getElementById('pincode_error');
+                                            const pincodePattern = /^\d{6}$/; // Exactly 6 numbers
+                                            if (!pincodePattern.test(pincode.value.trim())) {
+                                                pincodeError.textContent = 'Pincode must be exactly 6 digits.';
+                                                pincode.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                pincodeError.textContent = '';
+                                                pincode.classList.remove('is-invalid');
+                                            }
+                                
+                                            // Phone number validation
+                                            const phone = document.getElementById('phone');
+                                            const phoneError = document.getElementById('phone_error');
+                                            const phonePattern = /^\d{10}$/; // Exactly 10 numbers
+                                            if (!phonePattern.test(phone.value.trim())) {
+                                                phoneError.textContent = 'Phone number must be exactly 10 digits.';
+                                                phone.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                phoneError.textContent = '';
+                                                phone.classList.remove('is-invalid');
+                                            }
+                                
+                                            // Email validation
+                                            const email = document.getElementById('email');
+                                            const emailError = document.getElementById('email_error');
+                                            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Email format
+                                            if (!emailPattern.test(email.value.trim())) {
+                                                emailError.textContent = 'Please enter a valid email address.';
+                                                email.classList.add('is-invalid');
+                                                isValid = false;
+                                            } else {
+                                                emailError.textContent = '';
+                                                email.classList.remove('is-invalid');
+                                            }
+                                
+                                            // Prevent form submission if validation fails
+                                            if (!isValid) {
+                                                event.preventDefault(); // Prevent the form from submitting
+                                            }
+                                        });
+                                    });
+                                </script>
+                                
+                                
+                                
+                                
                             </div>
                         </div>
                     </aside>

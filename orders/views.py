@@ -226,7 +226,9 @@ from .models import OrderedItems
 @login_required(login_url='login')
 def place_order(request):
     if request.method == 'POST':
-      
+        coupon_id = request.POST.get('coupon_id')
+        if coupon_id == '':
+            coupon_id = None
         cart_items = CartItem.objects.filter(user=request.user, is_active=True)
         total = sum(item.sub_total() for item in cart_items)
         tax = (2 * total) / 100
@@ -279,7 +281,7 @@ def place_order(request):
                 city=address.city,
                 state=address.state,
                 pincode=address.pincode,
-                coupon_id=checkoutdetails.coupon.id if checkoutdetails.coupon else None  # Store the coupon ID
+                coupon_id=coupon_id
             )
             coupon_deduction = checkoutdetails.before_price - order.grand_total
     
@@ -353,7 +355,7 @@ def place_order(request):
                 city=address.city,
                 state=address.state,
                 pincode=address.pincode,
-                coupon_id=checkoutdetails.coupon.id if checkoutdetails.coupon else None  # Store the coupon ID
+                coupon_id=coupon_id
             )
             coupon_deduction = checkoutdetails.before_price - order.grand_total
           
@@ -436,7 +438,7 @@ def place_order(request):
 
 
         else:
-           
+
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             razorpay_payment_id = request.POST.get('razorpay_payment_id')
             razorpay_order_id = request.POST.get('razorpay_order_id')
@@ -449,7 +451,9 @@ def place_order(request):
             }
             checkoutdetails = CheckoutDetails.objects.filter(user=request.user).last()
             gt = checkoutdetails.grand_total
-            
+            coupon_id=Coupon.objects.last()
+            coupon_id.quantity-=1
+            coupon_id.save()
             try:
                 # Verify payment signature
                 client.utility.verify_payment_signature(params_dict)
@@ -476,7 +480,7 @@ def place_order(request):
                     city=address.city,
                     state=address.state,
                     pincode=address.pincode,
-                    coupon_id=checkoutdetails.coupon.id if checkoutdetails.coupon else None  # Store the coupon ID
+                   
                 )
                 coupon_deduction = checkoutdetails.before_price - order.grand_total
               
@@ -877,6 +881,14 @@ def order_successful(request):
     latest_order.status = 'Pending'
     latest_order.save()
 
+    if latest_order.coupon_id:
+        # Retrieve the coupon by its ID
+        coupon = Coupon.objects.get(id=latest_order.coupon_id)
+        
+        # Decrease the coupon quantity
+        coupon.quantity -= 1
+        coupon.save()
+    
     # Render the order success page
     return render(request, 'orders/order_successful.html')
 
@@ -983,6 +995,7 @@ def apply_coupon(request):
             coupon_code = data.get('coupon_code')
             
             coupon = get_object_or_404(Coupon, code=coupon_code, status='active')
+            request.session['coupon_id'] = coupon.id
             
             # Check if the coupon has expired
             if coupon.expiry_date < timezone.now().date():
@@ -1012,8 +1025,7 @@ def apply_coupon(request):
             order.coupon_applied = True
             order.save()
             
-            # Decrease the coupon quantity
-            coupon.quantity -= 1
+         
             coupon.save()
             
             # Log success
@@ -1062,7 +1074,7 @@ def remove_coupon(request):
             
             # Increase the coupon quantity
             if coupon:
-                coupon.quantity += 1
+                
                 coupon.save()
                 logger.info(f"Coupon quantity increased for coupon {coupon.id}")
             

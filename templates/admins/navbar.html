@@ -55,7 +55,7 @@
                 </a>
             </li> -->
 
-            <li class="menu-item {% url 'adminoffers' as adminoffers_url %}{% if request.path == adminoffers_url or 'adminoffers' in request.path or 'add-product-offer' in request.path or 'add-cat-offer' in request.path or 'edit-offer' in request.path or 'apply-offer' in request.path or 'apply-offer-to-category' in request.path or 'show-items' in request.path %}active{% endif %}">
+            <li class="menu-item {% url 'adminoffers' as adminoffers_url %}{% if request.path == adminoffers_url or 'adminoffers' in request.path or 'add-product-offer' in request.path or 'add-cat-offer' in request.path or 'edit-offer' in request.path or 'apply-offer' in request.path or 'apply-offer-to-category' in request.path or 'show-items' in request.path  or 'edit_offer' in request.path  %}active{% endif %}">
                 <a class="menu-link" href="{{ adminoffers_url }}">
                     <i class="icon material-icons md-monetization_on"></i>
                     <span class="text">Offers</span>

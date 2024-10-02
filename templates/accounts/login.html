@@ -53,7 +53,6 @@
 
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
-
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         let isValid = true;
@@ -74,10 +73,14 @@
             isValid = false;
         }
 
-        // Check password
+        // Check password (must contain at least one uppercase, one lowercase, one number, one special character, and 8+ characters)
         const password = document.getElementById('login_password');
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
         if (!password.value.trim()) {
             document.getElementById('password_error').textContent = 'Password is required';
+            isValid = false;
+        } else if (!passwordPattern.test(password.value.trim())) {
+            document.getElementById('password_error').textContent = 'Password must be at least 8 characters, and include one uppercase letter, one lowercase letter, one number, and one special character';
             isValid = false;
         }
 
@@ -86,5 +89,6 @@
         }
     });
 </script>
+
 
 {% endblock %}
